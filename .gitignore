@@ -1,1 +1,15 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE Directories
+.vscode/
+.idea/
+
+# Node / Dependencies
+node_modules/
+
+# Local task notes
 BUGS.md
+powershell.cmd
+powershell.bat

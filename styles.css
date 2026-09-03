@@ -255,10 +255,80 @@ button { font-family: inherit; cursor: pointer; }
 .node.is-complete .node__dot { border-color: var(--teal-400); background: var(--teal-700); }
 .node.is-complete .node__flame { background: var(--teal-400); box-shadow: 0 0 8px var(--teal-400); }
 
+.node.is-locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.node.is-locked .node__flame {
+  background: rgba(246, 241, 228, 0.2);
+}
+
 /* ============================================================
-   TEMP — dev audio test panel (delete with the HTML block above
-   once real station interactions trigger these sounds instead)
+   PROGRESSION LOCK TOAST NOTIFICATION
    ============================================================ */
+.quest-toast {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  background: linear-gradient(135deg, rgba(13, 40, 71, 0.96), rgba(6, 16, 36, 0.98));
+  border: 1.5px solid var(--gold-300);
+  border-radius: 16px;
+  padding: 0.85rem 1.4rem;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.75), 0 0 20px rgba(245, 158, 11, 0.3);
+  backdrop-filter: blur(12px);
+  z-index: 1000;
+  max-width: min(90vw, 440px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease-soft), transform 0.3s var(--ease-soft);
+}
+
+.quest-toast--show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.quest-toast--hide {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-15px);
+}
+
+.quest-toast__icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.quest-toast__content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.quest-toast__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gold-100);
+  margin: 0;
+}
+
+.quest-toast__sub {
+  font-size: 0.82rem;
+  color: var(--ivory-dim);
+  margin: 0;
+}
+
+/* Production UI Cleanup: Hide audio controls visually while keeping all underlying AudioEngine code intact */
+.ambient-toggle,
+.dev-audio {
+  display: none !important;
+}
+
 .dev-audio {
   max-width: 720px;
   margin: 0 auto var(--space-4);
@@ -373,7 +443,7 @@ button { font-family: inherit; cursor: pointer; }
 
 .wheel-frame {
   position: relative;
-  width: min(78vw, 300px);
+  width: min(84vw, 345px);
   aspect-ratio: 1;
 }
 
@@ -389,15 +459,16 @@ button { font-family: inherit; cursor: pointer; }
 
 .wheel-pointer {
   position: absolute;
-  top: -6px;
+  top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  width: 0; height: 0;
-  border-left: 11px solid transparent;
-  border-right: 11px solid transparent;
-  border-top: 18px solid var(--gold-300);
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-  z-index: 2;
+  width: 0;
+  height: 0;
+  border-left: 13px solid transparent;
+  border-right: 13px solid transparent;
+  border-top: 22px solid var(--gold-300);
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.75));
+  z-index: 4;
 }
 
 .wheel-hub {
@@ -407,11 +478,70 @@ button { font-family: inherit; cursor: pointer; }
   width: 20%;
   aspect-ratio: 1;
   border-radius: 50%;
+  pointer-events: none;
   z-index: 2;
 }
 .wheel-hub svg { width: 100%; height: 100%; }
 
+#spin-btn {
+  min-width: 200px;
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  transition: transform 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft), background 0.25s var(--ease-soft);
+}
+
+#spin-btn:hover:not(:disabled) {
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 0 28px rgba(245, 158, 11, 0.65);
+}
+
+.wheel-progress-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+}
+
+.wheel-progress-pips {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.wheel-progress-pips .pip {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  background: rgba(13, 40, 71, 0.6);
+  transition: background 0.3s var(--ease-soft), border-color 0.3s var(--ease-soft), transform 0.3s var(--ease-soft);
+}
+
+.wheel-progress-pips .pip--explored {
+  background: linear-gradient(135deg, var(--gold-300), var(--gold-600));
+  border-color: var(--gold-100);
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+  transform: scale(1.15);
+}
+
 .spin-counter { color: var(--ivory-dim); font-size: 0.92rem; text-align: center; }
+
+.station-next-btn {
+  margin-top: 0.8rem;
+  min-width: 190px;
+}
+
+.station-next-btn:disabled {
+  opacity: 0.5;
+  background: rgba(13, 40, 71, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  color: var(--ivory-dim);
+  box-shadow: none;
+  cursor: not-allowed;
+}
 
 /* ============================================================
    INQUIRY MODAL
@@ -535,18 +665,19 @@ button { font-family: inherit; cursor: pointer; }
 
 .avatar-stage {
   position: relative;
-  width: min(70vw, 220px);
+  width: min(70vw, 210px);
   aspect-ratio: 200 / 220;
   display: flex;
   align-items: center;
   justify-content: center;
+  margin: var(--space-2) auto;
 }
 
 /* Soft radial aura behind the figure. Its size/opacity grow with
    --glow-level (0–6), set from JS as each layer is removed. */
 .avatar-glow {
   position: absolute;
-  inset: -18%;
+  inset: -12%;
   border-radius: 50%;
   background: radial-gradient(circle, rgba(254, 240, 138, 0.9) 0%, rgba(245, 158, 11, 0.5) 35%, transparent 70%);
   opacity: calc(0.08 + var(--glow-level, 0) * 0.15);
@@ -559,10 +690,10 @@ button { font-family: inherit; cursor: pointer; }
 .avatar-figure {
   position: relative;
   z-index: 1;
-  width: 78%;
-  height: 78%;
-  opacity: calc(0.32 + var(--glow-level, 0) * 0.11);
-  filter: drop-shadow(0 0 calc(4px + var(--glow-level, 0) * 5px) rgba(245, 158, 11, calc(0.25 + var(--glow-level, 0) * 0.1)))
+  width: 84%;
+  height: 84%;
+  opacity: calc(0.35 + var(--glow-level, 0) * 0.11);
+  filter: drop-shadow(0 0 calc(6px + var(--glow-level, 0) * 6px) rgba(245, 158, 11, calc(0.3 + var(--glow-level, 0) * 0.1)))
           saturate(calc(0.7 + var(--glow-level, 0) * 0.06));
   transition: opacity 0.6s var(--ease-soft), filter 0.6s var(--ease-soft);
 }
@@ -571,8 +702,8 @@ button { font-family: inherit; cursor: pointer; }
 .avatar-stage--radiant .avatar-glow { animation: radiant-pulse-glow 2.6s var(--ease-soft) infinite; }
 
 @keyframes radiant-pulse {
-  0%, 100% { filter: drop-shadow(0 0 14px rgba(245, 158, 11, 0.55)) saturate(1.1); }
-  50% { filter: drop-shadow(0 0 26px rgba(254, 240, 138, 0.85)) saturate(1.3); }
+  0%, 100% { filter: drop-shadow(0 0 16px rgba(245, 158, 11, 0.65)) saturate(1.15); }
+  50% { filter: drop-shadow(0 0 28px rgba(254, 240, 138, 0.9)) saturate(1.35); }
 }
 @keyframes radiant-pulse-glow {
   0%, 100% { transform: scale(1.24); opacity: 1; }
@@ -580,22 +711,27 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 /* Each of the 6 "layers" is an abstract wrapping shell drawn around the
-   figure (not literal clothing) so any layer can dissolve independently
-   of the others, in any order the player taps them. */
+   figure. Shells can be clicked directly or peeled via chips. */
 .layer-shell {
   position: absolute;
   z-index: 2;
   top: 50%;
   left: 50%;
-  width: calc(100% * var(--shell-scale, 1.5));
+  width: calc(100% * var(--shell-scale, 1.3));
   aspect-ratio: 1;
   transform: translate(-50%, -50%);
   border-radius: 42% 58% 55% 45% / 55% 45% 58% 42%;
   border: 1.5px solid hsla(var(--shell-hue, 40), 70%, 70%, 0.4);
   background: hsla(var(--shell-hue, 40), 55%, 45%, 0.08);
   box-shadow: inset 0 0 24px hsla(var(--shell-hue, 40), 70%, 60%, 0.12);
-  pointer-events: none; /* the shell is a visual only — taps go through it to the avatar-stage below, not to whatever sits underneath the page */
-  transition: opacity 0.55s var(--ease-soft), transform 0.55s var(--ease-soft), filter 0.55s var(--ease-soft);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: opacity 0.55s var(--ease-soft), transform 0.55s var(--ease-soft), filter 0.55s var(--ease-soft), border-color 0.3s;
+}
+
+.layer-shell:hover {
+  border-color: var(--gold-300);
+  box-shadow: 0 0 16px hsla(var(--shell-hue, 40), 80%, 65%, 0.4);
 }
 
 .layer-shell--dissolving {
@@ -642,9 +778,9 @@ button { font-family: inherit; cursor: pointer; }
 .layer-chip__icon { font-size: 1.15rem; line-height: 1; }
 .layer-chip__label { flex: 1; }
 .layer-chip__status {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   color: var(--gold-300);
-  opacity: 0;
+  opacity: 0.8;
   transition: opacity 0.3s var(--ease-soft);
 }
 
@@ -684,11 +820,14 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .panel__kicker {
-  font-family: var(--font-quote);
-  font-style: italic;
+  font-family: var(--font-body);
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--teal-400);
-  font-size: 1.05rem;
-  margin-bottom: 0.3rem;
+  margin-bottom: 0.35rem;
 }
 
 .panel__title {
@@ -994,4 +1133,368 @@ button { font-family: inherit; cursor: pointer; }
   gap: 0.4rem;
   font-size: 0.9rem;
 }
+
+/* ============================================================
+   STATION 3 — HAPPINESS ROLLER COASTER
+   ============================================================ */
+.coaster-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* Happiness Meter */
+.coaster-meter-container {
+  width: 100%;
+  max-width: 580px;
+  background: rgba(6, 16, 36, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 16px;
+  padding: 0.85rem 1.1rem;
+}
+
+.coaster-meter-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.coaster-meter-title {
+  font-family: var(--font-quote);
+  font-style: italic;
+  color: var(--teal-400);
+}
+
+.coaster-meter-val {
+  font-weight: 600;
+  color: var(--gold-100);
+}
+
+.coaster-meter-track {
+  width: 100%;
+  height: 14px;
+  background: rgba(13, 40, 71, 0.8);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.coaster-meter-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold-500), var(--gold-300));
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.4);
+  transition: width 0.6s var(--ease-soft), background 0.6s var(--ease-soft);
+}
+
+/* Track Graphic */
+.coaster-track-visual {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  height: 100px;
+  background: rgba(13, 40, 71, 0.4);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.coaster-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.coaster-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.6s var(--ease-soft);
+  z-index: 2;
+}
+
+.coaster-marker__dot {
+  font-size: 1.6rem;
+  line-height: 1;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.6));
+}
+
+/* Stage Card */
+.coaster-stage-card {
+  width: 100%;
+  max-width: 540px;
+  background: linear-gradient(160deg, rgba(13, 40, 71, 0.9), rgba(6, 16, 36, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 20px;
+  padding: var(--space-3);
+  text-align: left;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  animation: rise 0.4s var(--ease-soft);
+}
+
+.coaster-stage-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.coaster-stage-card__icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.coaster-stage-card__badge {
+  display: inline-block;
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--gold-300);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  margin-bottom: 0.2rem;
+}
+
+.coaster-stage-card__title {
+  font-size: 1.3rem;
+  color: var(--gold-100);
+}
+
+.coaster-stage-card__desc {
+  color: var(--ivory-dim);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Controls */
+.coaster-controls {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+/* ============================================================
+   FINAL STATION — MIRROR REVEAL & SOUL CARD
+   ============================================================ */
+.final-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+/* Sacred Vrindavan Mirror */
+.mirror-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+}
+
+.mirror-frame {
+  position: relative;
+  width: min(75vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 3px solid var(--gold-500);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.4), inset 0 0 30px rgba(6, 16, 36, 0.8);
+  background: linear-gradient(145deg, rgba(13, 40, 71, 0.85), rgba(6, 16, 36, 0.95));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: border-color 0.5s var(--ease-soft), box-shadow 0.5s var(--ease-soft), transform 0.5s var(--ease-soft);
+}
+
+.mirror-shimmer {
+  position: absolute;
+  inset: -50%;
+  background: linear-gradient(45deg, transparent 40%, rgba(254, 240, 138, 0.25) 50%, transparent 60%);
+  animation: mirror-shimmer-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes mirror-shimmer-sweep {
+  0% { transform: translate(-30%, -30%) rotate(0deg); }
+  50% { transform: translate(30%, 30%) rotate(15deg); }
+  100% { transform: translate(-30%, -30%) rotate(0deg); }
+}
+
+.mirror-surface {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 1;
+}
+
+.mirror-emblem {
+  width: 68px;
+  height: 68px;
+  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.5));
+}
+
+.mirror-prompt {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.05rem;
+  color: var(--gold-300);
+}
+
+.mirror-frame--revealed {
+  border-color: var(--gold-100);
+  box-shadow: 0 0 40px rgba(254, 240, 138, 0.7), inset 0 0 40px rgba(20, 184, 166, 0.4);
+  transform: scale(1.05);
+}
+
+/* Realization Card & Declaration */
+.final-realization {
+  width: 100%;
+  max-width: 580px;
+}
+
+.realization-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+
+.realization-line {
+  font-size: 1.1rem;
+  color: var(--ivory-dim);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.5s var(--ease-soft), transform 0.5s var(--ease-soft);
+}
+
+.realization-line--visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.soul-declaration {
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-family: var(--font-display);
+  background: linear-gradient(180deg, var(--gold-100) 20%, var(--gold-500) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 20px rgba(245, 158, 11, 0.4);
+  margin-top: 1.2rem;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.8s var(--ease-soft), transform 0.8s var(--ease-soft);
+}
+
+.soul-declaration--visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Name Form */
+.soul-card-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+}
+
+.soul-card-form__label {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.1rem;
+  color: var(--gold-300);
+}
+
+.soul-card-form__row {
+  display: flex;
+  gap: 0.6rem;
+  width: 100%;
+  max-width: 440px;
+}
+
+@media (max-width: 480px) {
+  .soul-card-form__row {
+    flex-direction: column;
+  }
+}
+
+.soul-card-form__input {
+  flex: 1;
+  background: rgba(6, 16, 36, 0.8);
+  border: 1.5px solid rgba(245, 158, 11, 0.4);
+  border-radius: 999px;
+  padding: 0.65rem 1.2rem;
+  color: var(--ivory);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft);
+}
+
+.soul-card-form__input:focus {
+  border-color: var(--gold-300);
+  box-shadow: 0 0 12px rgba(251, 191, 36, 0.4);
+}
+
+.form-error {
+  color: #ff7a4d;
+  font-size: 0.88rem;
+  margin-top: 0.2rem;
+}
+
+/* Card Result & Actions */
+.soul-card-result {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.2rem;
+  width: 100%;
+  max-width: 580px;
+  animation: rise 0.5s var(--ease-soft);
+}
+
+.soul-card-preview-container {
+  width: 100%;
+  max-width: 440px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 50px -15px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.3);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+#soul-card-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.soul-card-actions {
+  display: flex;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.action-feedback {
+  font-size: 0.92rem;
+  color: var(--teal-400);
+  font-family: var(--font-quote);
+  font-style: italic;
+}
+
+
 

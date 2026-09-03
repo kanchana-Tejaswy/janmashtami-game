@@ -225,9 +225,25 @@ const Station2Boxes = (() => {
       els.reveal.scrollIntoView({ behavior: "smooth", block: "center" });
     }
 
+    // Ensure continue button has active listener
+    const contBtn = document.getElementById("station2-continue-btn");
+    if (contBtn && !contBtn._bound) {
+      contBtn._bound = true;
+      contBtn.addEventListener("click", () => {
+        if (typeof AudioEngine !== "undefined" && AudioEngine.playClick) AudioEngine.playClick();
+        if (typeof VrindavanQuest !== "undefined" && typeof VrindavanQuest.goToStation === "function") {
+          VrindavanQuest.goToStation("3");
+        } else if (window.VrindavanQuest) {
+          window.VrindavanQuest.goToStation("3");
+        }
+      });
+    }
+
     // Call VrindavanQuest.markComplete("2") to mark station 2 complete in nav line!
-    if (window.VrindavanQuest && typeof VrindavanQuest.markComplete === "function") {
+    if (typeof VrindavanQuest !== "undefined" && typeof VrindavanQuest.markComplete === "function") {
       VrindavanQuest.markComplete("2");
+    } else if (window.VrindavanQuest) {
+      window.VrindavanQuest.markComplete("2");
     }
   }
 
@@ -253,7 +269,7 @@ const Station2Boxes = (() => {
 
     if (els.detailNextBtn) {
       els.detailNextBtn.addEventListener("click", () => {
-        if (window.AudioEngine) AudioEngine.playClick();
+        if (typeof AudioEngine !== "undefined" && AudioEngine.playClick) AudioEngine.playClick();
         const currentId = state.currentlyOpened;
         closeDetailCard();
         if (currentId && currentId < TOTAL_BOXES) {
@@ -263,20 +279,24 @@ const Station2Boxes = (() => {
     }
 
     if (els.continueBtn) {
+      els.continueBtn._bound = true;
       els.continueBtn.addEventListener("click", () => {
-        if (window.AudioEngine) AudioEngine.playClick();
-        if (window.VrindavanQuest && typeof VrindavanQuest.goToStation === "function") {
+        if (typeof AudioEngine !== "undefined" && AudioEngine.playClick) AudioEngine.playClick();
+        if (typeof VrindavanQuest !== "undefined" && typeof VrindavanQuest.goToStation === "function") {
           VrindavanQuest.goToStation("3");
+        } else if (window.VrindavanQuest) {
+          window.VrindavanQuest.goToStation("3");
         }
       });
     }
   }
 
   function init() {
-    if (!document.getElementById("boxes-grid")) return; // Not on page
     cacheEls();
     bind();
-    updateCounter();
+    if (document.getElementById("boxes-grid")) {
+      updateCounter();
+    }
   }
 
   return { init };

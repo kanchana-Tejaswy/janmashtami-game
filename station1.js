@@ -103,42 +103,84 @@ const Station1 = (() => {
       const p2 = point(cx, cy, r, end);
       const large = end - start > 180 ? 1 : 0;
 
+      // Slice Path
       const path = document.createElementNS(NS, "path");
       path.setAttribute(
         "d",
         `M ${cx} ${cy} L ${p1.x.toFixed(2)} ${p1.y.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${p2.x.toFixed(2)} ${p2.y.toFixed(2)} Z`
       );
       path.setAttribute("fill", SLICE_FILLS[i % 2]);
-      path.setAttribute("stroke", "rgba(245,158,11,0.35)");
-      path.setAttribute("stroke-width", "1");
+      path.setAttribute("stroke", "rgba(245,158,11,0.45)");
+      path.setAttribute("stroke-width", "1.5");
       path.setAttribute("id", `slice-path-${i}`);
       path.classList.add("wheel-slice");
       svg.appendChild(path);
 
       const mid = i * SLICE_ANGLE;
-      const iconPt = point(cx, cy, r * 0.68, mid);
-      const labelPt = point(cx, cy, r * 0.88, mid);
+      const isFlipped = mid > 90 && mid < 270;
+      const rot = isFlipped ? mid + 180 : mid;
 
+      // Outer Rim -> ICON -> LABEL -> Hub rhythm
+      const rIcon = isFlipped ? r * 0.48 : r * 0.72;
+      const rLabel = isFlipped ? r * 0.72 : r * 0.48;
+
+      const iconPt = point(cx, cy, rIcon, mid);
+      const labelPt = point(cx, cy, rLabel, mid);
+
+      // Icon (normalized 26px font-size bounding box)
       const icon = document.createElementNS(NS, "text");
-      icon.setAttribute("x", iconPt.x);
-      icon.setAttribute("y", iconPt.y);
+      icon.setAttribute("x", iconPt.x.toFixed(2));
+      icon.setAttribute("y", iconPt.y.toFixed(2));
       icon.setAttribute("text-anchor", "middle");
       icon.setAttribute("dominant-baseline", "central");
-      icon.setAttribute("font-size", "22");
+      icon.setAttribute("font-size", "24");
+      icon.setAttribute("transform", `rotate(${rot.toFixed(1)}, ${iconPt.x.toFixed(2)}, ${iconPt.y.toFixed(2)})`);
       icon.textContent = cat.icon;
       svg.appendChild(icon);
 
+      // Label (right-side up, consistent padding)
+      const fontSize = cat.label.length > 10 ? "10.5" : "12";
       const label = document.createElementNS(NS, "text");
-      label.setAttribute("x", labelPt.x);
-      label.setAttribute("y", labelPt.y);
+      label.setAttribute("x", labelPt.x.toFixed(2));
+      label.setAttribute("y", labelPt.y.toFixed(2));
       label.setAttribute("text-anchor", "middle");
       label.setAttribute("dominant-baseline", "central");
-      label.setAttribute("font-size", "10.5");
+      label.setAttribute("font-size", fontSize);
+      label.setAttribute("font-weight", "700");
       label.setAttribute("font-family", "Mukta, sans-serif");
       label.setAttribute("fill", "#f6f1e4");
       label.setAttribute("id", `slice-label-${i}`);
+      label.setAttribute("transform", `rotate(${rot.toFixed(1)}, ${labelPt.x.toFixed(2)}, ${labelPt.y.toFixed(2)})`);
       label.textContent = cat.label;
       svg.appendChild(label);
+
+      // Completed / Explored Badge pinned near outer rim
+      const badgePt = point(cx, cy, r * 0.84, start + SLICE_ANGLE * 0.82);
+      const badgeGrp = document.createElementNS(NS, "g");
+      badgeGrp.setAttribute("id", `slice-badge-${i}`);
+      badgeGrp.setAttribute("opacity", "0");
+
+      const badgeBg = document.createElementNS(NS, "circle");
+      badgeBg.setAttribute("cx", badgePt.x.toFixed(2));
+      badgeBg.setAttribute("cy", badgePt.y.toFixed(2));
+      badgeBg.setAttribute("r", "10");
+      badgeBg.setAttribute("fill", "#f59e0b");
+      badgeBg.setAttribute("stroke", "#061024");
+      badgeBg.setAttribute("stroke-width", "1.5");
+      badgeGrp.appendChild(badgeBg);
+
+      const badgeTxt = document.createElementNS(NS, "text");
+      badgeTxt.setAttribute("x", badgePt.x.toFixed(2));
+      badgeTxt.setAttribute("y", badgePt.y.toFixed(2));
+      badgeTxt.setAttribute("text-anchor", "middle");
+      badgeTxt.setAttribute("dominant-baseline", "central");
+      badgeTxt.setAttribute("font-size", "11");
+      badgeTxt.setAttribute("font-weight", "bold");
+      badgeTxt.setAttribute("fill", "#061024");
+      badgeTxt.textContent = "✓";
+      badgeGrp.appendChild(badgeTxt);
+
+      svg.appendChild(badgeGrp);
     });
 
     // Outer chakra ring for ornamentation
@@ -148,13 +190,23 @@ const Station1 = (() => {
     ring.setAttribute("r", r);
     ring.setAttribute("fill", "none");
     ring.setAttribute("stroke", "#f59e0b");
-    ring.setAttribute("stroke-width", "3");
+    ring.setAttribute("stroke-width", "3.5");
     svg.appendChild(ring);
   }
 
   function getLandedIndex(totalRotationDeg) {
     const normalized = (((-totalRotationDeg) % 360) + 360) % 360;
     return Math.round(normalized / SLICE_ANGLE) % SLICE_COUNT;
+  }
+
+  function markSliceVisited(index) {
+    const path = document.getElementById(`slice-path-${index}`);
+    const badge = document.getElementById(`slice-badge-${index}`);
+    if (path) path.setAttribute("fill-opacity", "0.55");
+    if (badge) {
+      badge.setAttribute("opacity", "1");
+      badge.style.transition = "opacity 0.4s ease";
+    }
   }
 
   /* ---------------- Spin ---------------- */
@@ -242,7 +294,10 @@ const Station1 = (() => {
     els.modal.hidden = true;
     const index = state.pendingIndex;
     state.pendingIndex = null;
-    state.visited.add(index);
+    if (index !== null) {
+      state.visited.add(index);
+      markSliceVisited(index);
+    }
 
     updateCounter();
     els.spinBtn.disabled = false;
@@ -256,10 +311,36 @@ const Station1 = (() => {
 
   function updateCounter() {
     const n = state.visited.size;
-    if (n >= REVEAL_THRESHOLD) {
-      els.counter.textContent = `Slices explored: ${n} of 7 \u00b7 the soul is ready to reveal itself`;
-    } else {
-      els.counter.textContent = `Slices explored: ${n} of 7 \u00b7 need ${REVEAL_THRESHOLD} to continue`;
+
+    // Update pips
+    if (els.pips && els.pips.children) {
+      Array.from(els.pips.children).forEach((pip, idx) => {
+        if (idx < n) {
+          pip.classList.add("pip--explored");
+        } else {
+          pip.classList.remove("pip--explored");
+        }
+      });
+    }
+
+    if (els.counter) {
+      if (n >= REVEAL_THRESHOLD) {
+        els.counter.textContent = `${n} of 7 unique slices explored \u00b7 Journey continues!`;
+      } else {
+        els.counter.textContent = `${n} of 7 unique slices explored \u00b7 need ${REVEAL_THRESHOLD} to continue`;
+      }
+    }
+
+    if (els.nextBtn) {
+      if (n >= REVEAL_THRESHOLD) {
+        els.nextBtn.disabled = false;
+        els.nextBtn.removeAttribute("aria-disabled");
+        els.nextBtn.textContent = "Next Station \u2192";
+      } else {
+        els.nextBtn.disabled = true;
+        els.nextBtn.setAttribute("aria-disabled", "true");
+        els.nextBtn.textContent = "\ud83d\udd12 Next Station \u2192";
+      }
     }
   }
 
@@ -280,6 +361,8 @@ const Station1 = (() => {
     els.wheel = document.getElementById("identity-wheel");
     els.spinBtn = document.getElementById("spin-btn");
     els.counter = document.getElementById("spin-counter");
+    els.pips = document.getElementById("wheel-progress-pips");
+    els.nextBtn = document.getElementById("station1-next-btn");
     els.reveal = document.getElementById("soul-reveal-a");
 
     els.modal = document.getElementById("inquiry-modal");
@@ -291,13 +374,23 @@ const Station1 = (() => {
   }
 
   function bind() {
-    els.spinBtn.addEventListener("click", spin);
-    els.answers.querySelectorAll("button[data-answer]").forEach((btn) => {
-      btn.addEventListener("click", answerInquiry);
-    });
-    els.continueBtn.addEventListener("click", closeInquiry);
+    if (els.spinBtn) els.spinBtn.addEventListener("click", spin);
+    if (els.nextBtn) {
+      els.nextBtn.addEventListener("click", () => {
+        if (window.AudioEngine) AudioEngine.playClick();
+        if (window.VrindavanQuest && typeof VrindavanQuest.goToStation === "function") {
+          VrindavanQuest.goToStation("2");
+        }
+      });
+    }
+    if (els.answers) {
+      els.answers.querySelectorAll("button[data-answer]").forEach((btn) => {
+        btn.addEventListener("click", answerInquiry);
+      });
+    }
+    if (els.continueBtn) els.continueBtn.addEventListener("click", closeInquiry);
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !els.modal.hidden && !els.continueBtn.hidden) {
+      if (e.key === "Escape" && els.modal && !els.modal.hidden && !els.continueBtn.hidden) {
         closeInquiry();
       }
     });
@@ -419,13 +512,11 @@ const Station1Layers = (() => {
   }
 
   function bind() {
-    // Shells are purely decorative (the avatar's glow builds up behind
-    // them) and are deliberately non-interactive — they're allowed to
-    // visually bleed past the avatar stage as they get bigger, and giving
-    // them pointer-events would let a big outer shell block taps on the
-    // chip list underneath it. The chips are the actual tap targets.
     els.chips.forEach((chip) => {
       chip.addEventListener("click", () => removeLayer(Number(chip.dataset.layer)));
+    });
+    els.shells.forEach((shell) => {
+      shell.addEventListener("click", () => removeLayer(Number(shell.dataset.layer)));
     });
   }
 

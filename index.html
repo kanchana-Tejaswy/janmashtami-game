@@ -71,6 +71,15 @@
     </button>
   </header>
 
+  <!-- Progression Lock Toast Notification -->
+  <div class="quest-toast" id="quest-toast" role="status" aria-live="polite" hidden>
+    <div class="quest-toast__icon" aria-hidden="true">🔒</div>
+    <div class="quest-toast__content">
+      <p class="quest-toast__title" id="quest-toast-title">Complete Level 2 first to continue your journey.</p>
+      <p class="quest-toast__sub" id="quest-toast-sub">Reveal all 5 Mystery Boxes to unlock the next level.</p>
+    </div>
+  </div>
+
   <!-- ================= JOURNEY PATH NAV ================= -->
   <nav class="river-nav" aria-label="Journey stations">
     <svg class="river-nav__line" viewBox="0 0 100 900" preserveAspectRatio="none" aria-hidden="true">
@@ -149,10 +158,10 @@
   <main class="stage" id="stage">
 
     <section class="panel" id="station-1" data-active="true">
-      <p class="panel__kicker">Station I</p>
+      <p class="panel__kicker">STATION I</p>
       <h2 class="panel__title">Who Am I?</h2>
-      <p class="panel__intro" id="station1-intro-a">Beneath every name you've worn and every role you've played, something has watched it all without changing. Spin the wheel and question what you find.</p>
-      <p class="panel__intro" id="station1-intro-b" hidden>Everything about you that can be pointed to, named, or removed will eventually be removed. Tap each layer away and see what's left when nothing external remains.</p>
+      <p class="panel__intro" id="station1-intro-a">Spin the wheel to question what changes and what remains.</p>
+      <p class="panel__intro" id="station1-intro-b" hidden>Peel back each layer to reveal what remains.</p>
 
       <div class="substation-switcher" role="tablist" aria-label="Station I activities">
         <button type="button" class="substation-tab" id="substation-tab-a" data-activity="a" role="tab" aria-selected="true" aria-controls="wheel-activity">
@@ -176,8 +185,22 @@
               </div>
             </div>
 
-            <button id="spin-btn" class="btn-primary" type="button">Spin the Wheel</button>
-            <p class="spin-counter" id="spin-counter">Slices explored: 0 of 7 &middot; need 4 to continue</p>
+            <button id="spin-btn" class="btn-primary" type="button">Spin Now</button>
+
+            <div class="wheel-progress-container">
+              <div class="wheel-progress-pips" id="wheel-progress-pips" aria-hidden="true">
+                <span class="pip"></span>
+                <span class="pip"></span>
+                <span class="pip"></span>
+                <span class="pip"></span>
+                <span class="pip"></span>
+                <span class="pip"></span>
+                <span class="pip"></span>
+              </div>
+              <p class="spin-counter" id="spin-counter">0 of 7 unique slices explored &middot; need 4 to continue</p>
+            </div>
+
+            <button type="button" class="btn-primary station-next-btn" id="station1-next-btn" disabled aria-disabled="true">🔒 Next Station &rarr;</button>
           </div>
 
           <div class="soul-reveal" id="soul-reveal-a" hidden tabindex="-1">
@@ -200,7 +223,8 @@
                   <stop offset="100%" stop-color="#b45309"/>
                 </radialGradient>
               </defs>
-              <ellipse cx="100" cy="196" rx="54" ry="10" fill="#000" opacity="0.25"/>
+              <ellipse cx="100" cy="196" rx="58" ry="12" fill="#f59e0b" opacity="0.35" filter="blur(3px)"/>
+              <ellipse cx="100" cy="196" rx="54" ry="10" fill="#000" opacity="0.3"/>
               <path d="M100,150 C60,150 46,178 46,206 L154,206 C154,178 140,150 100,150 Z" fill="url(#avatarGradient)"/>
               <path d="M62,150 C50,168 44,188 44,206 L36,206 C36,182 44,160 58,144 Z" fill="url(#avatarGradient)"/>
               <path d="M138,150 C150,168 156,188 156,206 L164,206 C164,182 156,160 142,144 Z" fill="url(#avatarGradient)"/>
@@ -208,44 +232,44 @@
               <path d="M78,150 C78,128 86,116 100,116 C114,116 122,128 122,150 Z" fill="url(#avatarGradient)"/>
             </svg>
 
-            <div class="layer-shell" data-layer="0" style="--shell-scale:2.05; --shell-hue:200"></div>
-            <div class="layer-shell" data-layer="1" style="--shell-scale:1.82; --shell-hue:250"></div>
-            <div class="layer-shell" data-layer="2" style="--shell-scale:1.6; --shell-hue:20"></div>
-            <div class="layer-shell" data-layer="3" style="--shell-scale:1.4; --shell-hue:330"></div>
-            <div class="layer-shell" data-layer="4" style="--shell-scale:1.22; --shell-hue:170"></div>
-            <div class="layer-shell" data-layer="5" style="--shell-scale:1.08; --shell-hue:45"></div>
+            <div class="layer-shell" data-layer="0" style="--shell-scale:1.55; --shell-hue:200" title="Tap to peel Body layer"></div>
+            <div class="layer-shell" data-layer="1" style="--shell-scale:1.44; --shell-hue:250" title="Tap to peel Emotions layer"></div>
+            <div class="layer-shell" data-layer="2" style="--shell-scale:1.33; --shell-hue:20" title="Tap to peel Profession layer"></div>
+            <div class="layer-shell" data-layer="3" style="--shell-scale:1.22; --shell-hue:330" title="Tap to peel Name layer"></div>
+            <div class="layer-shell" data-layer="4" style="--shell-scale:1.12; --shell-hue:170" title="Tap to peel Identity layer"></div>
+            <div class="layer-shell" data-layer="5" style="--shell-scale:1.02; --shell-hue:45" title="Tap to peel Thoughts layer"></div>
           </div>
 
           <div class="layer-list" id="layer-list" role="list" aria-label="Layers to remove">
             <button type="button" class="layer-chip" data-layer="0">
               <span class="layer-chip__icon" aria-hidden="true">👗</span>
               <span class="layer-chip__label">Body</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
             <button type="button" class="layer-chip" data-layer="1">
               <span class="layer-chip__icon" aria-hidden="true">😊</span>
               <span class="layer-chip__label">Emotions</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
             <button type="button" class="layer-chip" data-layer="2">
               <span class="layer-chip__icon" aria-hidden="true">💼</span>
               <span class="layer-chip__label">Profession</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
             <button type="button" class="layer-chip" data-layer="3">
               <span class="layer-chip__icon" aria-hidden="true">🪪</span>
               <span class="layer-chip__label">Name</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
             <button type="button" class="layer-chip" data-layer="4">
               <span class="layer-chip__icon" aria-hidden="true">📱</span>
               <span class="layer-chip__label">Identity &amp; Status</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
             <button type="button" class="layer-chip" data-layer="5">
               <span class="layer-chip__icon" aria-hidden="true">🧠</span>
               <span class="layer-chip__label">Thoughts &amp; Ego</span>
-              <span class="layer-chip__status" aria-hidden="true"></span>
+              <span class="layer-chip__status" aria-hidden="true">◉</span>
             </button>
           </div>
 
@@ -390,7 +414,7 @@
             <p class="soul-reveal__quote">Money provided comfort, career brought recognition, relationships offered warmth, and experiences filled your days — yet after all four, a quiet longing remained. Human life is unique because only a human being can ask this ultimate question.</p>
             <p class="soul-reveal__verse">"Athāto brahma-jijñāsā — Now, therefore, in the human form of life, one should inquire into the Absolute Truth."<br><span>— Vedanta-sūtra 1.1.1</span></p>
 
-            <button type="button" class="btn-primary" id="station2-continue-btn" style="margin-top: 1.5rem;">Continue the Journey &rarr;</button>
+            <button type="button" class="btn-primary" id="station2-continue-btn" onclick="if(window.VrindavanQuest) VrindavanQuest.goToStation('3');" style="margin-top: 1.5rem;">Continue the Journey &rarr;</button>
           </div>
         </div>
       </div>
@@ -399,18 +423,149 @@
     <section class="panel" id="station-3" data-active="false">
       <p class="panel__kicker">Station III</p>
       <h2 class="panel__title">What Really Makes Me Happy?</h2>
-      <p class="panel__intro">Some joy rises and falls with circumstance. Some doesn't move at all. Ride the current and feel the difference for yourself.</p>
-      <div class="panel__body panel__body--placeholder">
-        <p>The Happiness Roller Coaster runs here.</p>
+      <p class="panel__intro">Some joy rises and falls with circumstance. Some doesn't move at all. Ride the roller coaster and feel the difference for yourself.</p>
+
+      <div class="panel__body">
+        <div class="coaster-activity" id="coaster-activity">
+          <p class="spin-counter" id="coaster-counter">Click 'Start the Coaster' to experience the journey</p>
+
+          <!-- Happiness Meter -->
+          <div class="coaster-meter-container" aria-label="Happiness Meter">
+            <div class="coaster-meter-header">
+              <span class="coaster-meter-title">Happiness Meter</span>
+              <span class="coaster-meter-val" id="coaster-meter-text">50% &middot; Baseline</span>
+            </div>
+            <div class="coaster-meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+              <div class="coaster-meter-fill" id="coaster-meter-fill" style="width: 50%;"></div>
+            </div>
+          </div>
+
+          <!-- Roller Coaster SVG Path Graphic -->
+          <div class="coaster-track-visual" aria-hidden="true">
+            <svg viewBox="0 0 600 120" preserveAspectRatio="none" class="coaster-svg">
+              <line x1="0" y1="60" x2="600" y2="60" stroke="rgba(245,158,11,0.15)" stroke-dasharray="4,4"/>
+              <path d="M 0,90 Q 150,10 300,15 T 450,110 Q 500,60 600,60" fill="none" stroke="rgba(245,158,11,0.35)" stroke-width="3"/>
+              <line x1="480" y1="60" x2="600" y2="60" stroke="#14b8a6" stroke-width="4" stroke-linecap="round"/>
+            </svg>
+            <div class="coaster-marker" id="coaster-path-marker" style="left: 0%;">
+              <span class="coaster-marker__dot">🎢</span>
+            </div>
+          </div>
+
+          <!-- Current Stage Card -->
+          <div class="coaster-stage-card" id="coaster-stage-card" hidden aria-live="polite">
+            <div class="coaster-stage-card__header">
+              <span class="coaster-stage-card__icon" id="coaster-stage-icon">🛍️</span>
+              <div>
+                <span class="coaster-stage-card__badge" id="coaster-stage-status">External High</span>
+                <h3 class="coaster-stage-card__title" id="coaster-stage-title">Shopping &amp; Gadgets</h3>
+              </div>
+            </div>
+            <p class="coaster-stage-card__desc" id="coaster-stage-desc">New clothes and gadgets bring an immediate splash of excitement!</p>
+          </div>
+
+          <!-- Controls -->
+          <div class="coaster-controls">
+            <button type="button" class="btn-primary" id="coaster-start-btn">Start the Coaster &rarr;</button>
+            <button type="button" class="btn-primary" id="coaster-step-btn" hidden>Step Forward &rarr;</button>
+          </div>
+
+          <!-- Final Soul Reveal Card -->
+          <div class="soul-reveal" id="station3-reveal" hidden tabindex="-1">
+            <p class="panel__kicker">The Eternal Anchor</p>
+            <h3 class="soul-reveal__title">Which happiness survives life's ups and downs?</h3>
+            <p class="soul-reveal__quote">External highs rise with pleasant circumstances and plummet when life turns difficult. But the joy of spiritual connection (Atma-rati) does not depend on changing conditions — it remains eternally serene, whole, and unshakable.</p>
+            <p class="soul-reveal__verse">"Yam labdhvā cāparaṁ lābhaṁ manyate nādhikaṁ tataḥ — Upon gaining this spiritual connection, one considers no other gain greater, and standing in such a position, one is never shaken, even amidst the greatest difficulty."<br><span>— Bhagavad Gita 6.22</span></p>
+
+            <button type="button" class="btn-primary" id="station3-continue-btn" onclick="if(window.VrindavanQuest) VrindavanQuest.goToStation('final');" style="margin-top: 1.5rem;">Continue the Journey &rarr;</button>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="panel" id="station-final" data-active="false">
       <p class="panel__kicker">The Final Station</p>
-      <h2 class="panel__title">The Mirror Reveal</h2>
-      <p class="panel__intro">Everything you've discovered leads back to a single question, asked in front of your own reflection.</p>
-      <div class="panel__body panel__body--placeholder">
-        <p>The Vrindavan Mirror, your Soul Card, and the Prayer Wall live here.</p>
+      <h2 class="panel__title">The Journey Within</h2>
+      <p class="panel__intro">You searched for happiness outside. Now look within.</p>
+
+      <div class="panel__body">
+        <div class="final-activity" id="final-activity">
+          
+          <!-- PHASE 1 & 2: Sacred Vrindavan Mirror -->
+          <div class="mirror-container" id="mirror-container">
+            <div class="mirror-frame" id="mirror-frame">
+              <div class="mirror-shimmer" aria-hidden="true"></div>
+              <div class="mirror-surface" id="mirror-surface">
+                <svg class="mirror-emblem" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle cx="50" cy="50" r="44" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 3"/>
+                  <path d="M50,15 C55,35 75,50 50,85 C25,50 45,35 50,15 Z" fill="url(#archGold)" opacity="0.8"/>
+                  <circle cx="50" cy="50" r="8" fill="#f59e0b"/>
+                </svg>
+                <p class="mirror-prompt" id="mirror-prompt-text">Gaze into the mirror</p>
+              </div>
+            </div>
+
+            <button type="button" class="btn-primary" id="mirror-reveal-btn">Look Within &rarr;</button>
+          </div>
+
+          <!-- PHASE 3 & 4 & 5: Inner Realization & Gita Verse Card -->
+          <div class="soul-reveal final-realization" id="final-realization-card" hidden tabindex="-1">
+            <p class="panel__kicker">Inner Realization</p>
+            <h3 class="soul-reveal__title" id="realization-headline">Who am I?</h3>
+            
+            <div class="realization-lines" id="realization-lines">
+              <p class="realization-line" data-step="1">I am more than what I own.</p>
+              <p class="realization-line" data-step="2">More than what I achieve.</p>
+              <p class="realization-line" data-step="3">More than what others think of me.</p>
+              <h2 class="soul-declaration" id="soul-declaration" hidden>I am the soul.</h2>
+            </div>
+
+            <div class="purpose-section" id="purpose-section" hidden>
+              <p class="panel__kicker" style="margin-top:1.5rem;">Life's True Purpose</p>
+              <p class="soul-reveal__quote">To discover who you truly are, connect with the Divine, and live with purpose.</p>
+            </div>
+
+            <div class="verse-section" id="verse-section" hidden>
+              <p class="soul-reveal__verse" style="margin-top:1.5rem;">
+                "यं लब्ध्वा चापरं लाभं मन्यते नाधिकं ततः"<br>
+                <span>"Having gained this, one considers no other gain greater than this."</span>
+                <br><span style="color:var(--gold-300); font-weight:600; margin-top:0.4rem;">— Bhagavad Gita 6.22</span>
+              </p>
+
+              <!-- PHASE 6: Player Name Form -->
+              <div class="soul-card-form" id="soul-card-form">
+                <p class="panel__kicker" style="margin-top:1.8rem;">Carry this realization with you</p>
+                <label for="player-name-input" class="soul-card-form__label">What is your name?</label>
+                <div class="soul-card-form__row">
+                  <input type="text" id="player-name-input" class="soul-card-form__input" placeholder="Enter your name" maxlength="30" autocomplete="off" />
+                  <button type="button" class="btn-primary" id="create-card-btn">Create My Soul Card &rarr;</button>
+                </div>
+                <p class="form-error" id="name-form-error" hidden>Please enter your name to create your keepsake.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- PHASE 7: Soul Card Preview & Actions -->
+          <div class="soul-card-result" id="soul-card-result" hidden tabindex="-1">
+            <p class="panel__kicker">Your Sacred Keepsake</p>
+            <h3 class="soul-reveal__title">Janmashtami Soul Card</h3>
+            
+            <div class="soul-card-preview-container">
+              <canvas id="soul-card-canvas" width="1200" height="1600" aria-label="Janmashtami Soul Card Keepsake" role="img"></canvas>
+            </div>
+
+            <div class="soul-card-actions">
+              <button type="button" class="btn-primary" id="save-card-btn">
+                <span>💾 Save Soul Card</span>
+              </button>
+              <button type="button" class="btn-outline" id="share-card-btn">
+                <span>🔗 Share Soul Card</span>
+              </button>
+            </div>
+            <p class="action-feedback" id="action-feedback-text" hidden aria-live="polite"></p>
+          </div>
+
+        </div>
       </div>
     </section>
 
@@ -438,6 +593,8 @@
 <script src="audio.js"></script>
 <script src="station1.js"></script>
 <script src="station2.js"></script>
+<script src="station3.js"></script>
+<script src="final.js"></script>
 <script src="app.js"></script>
 <script>
   // TEMP: wires the dev audio panel above. Delete this block together with
@@ -455,10 +612,10 @@
     });
   });
 
-  document.getElementById("dev-burst-center").addEventListener("click", () => {
+  document.getElementById("dev-burst-center")?.addEventListener("click", () => {
     ParticleEngine.burst(0.5, 0.4, { count: 50 });
   });
-  document.getElementById("dev-burst-big").addEventListener("click", () => {
+  document.getElementById("dev-burst-big")?.addEventListener("click", () => {
     ParticleEngine.burst(0.5, 0.35, { count: 120 });
     AudioEngine.playCelebration();
   });
