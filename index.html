@@ -264,9 +264,135 @@
     <section class="panel" id="station-2" data-active="false">
       <p class="panel__kicker">Station II</p>
       <h2 class="panel__title">Why Is Human Life Special?</h2>
-      <p class="panel__intro">We chase one milestone, then the next, certain the finish line will finally feel like enough. What are we actually running toward?</p>
-      <div class="panel__body panel__body--placeholder">
-        <p>The Life Race and the five Mystery Boxes await here.</p>
+      <p class="panel__intro">We chase one milestone, then the next, certain the finish line will finally feel like enough. Open each mystery box to discover what humans spend their lives seeking.</p>
+
+      <div class="panel__body">
+        <div class="boxes-activity" id="boxes-activity" data-active="true">
+          <p class="spin-counter" id="boxes-counter">Boxes opened: 0 of 5 &middot; tap Box 1 to open</p>
+
+          <div class="boxes-grid" id="boxes-grid" role="list" aria-label="5 Mystery Boxes">
+            <!-- Box 1 -->
+            <div class="box-card" data-box="1" data-state="ready" role="listitem">
+              <div class="box-card__chest">
+                <div class="box-card__aura" aria-hidden="true"></div>
+                <div class="box-card__lid" aria-hidden="true">
+                  <span class="box-card__lock">🔓</span>
+                </div>
+                <div class="box-card__body">
+                  <span class="box-card__icon" aria-hidden="true">🪙</span>
+                </div>
+              </div>
+              <div class="box-card__info">
+                <span class="box-card__num">Box I</span>
+                <span class="box-card__label">Money</span>
+              </div>
+              <button type="button" class="box-card__btn btn-outline" data-box-action="1" aria-label="Open Box 1: Money &amp; Wealth">
+                Open Box
+              </button>
+            </div>
+
+            <!-- Box 2 -->
+            <div class="box-card" data-box="2" data-state="locked" role="listitem">
+              <div class="box-card__chest">
+                <div class="box-card__aura" aria-hidden="true"></div>
+                <div class="box-card__lid" aria-hidden="true">
+                  <span class="box-card__lock">🔒</span>
+                </div>
+                <div class="box-card__body">
+                  <span class="box-card__icon" aria-hidden="true">🏆</span>
+                </div>
+              </div>
+              <div class="box-card__info">
+                <span class="box-card__num">Box II</span>
+                <span class="box-card__label">Career</span>
+              </div>
+              <button type="button" class="box-card__btn btn-outline" data-box-action="2" disabled aria-disabled="true" aria-label="Box 2: Career &amp; Status (Locked)">
+                Locked
+              </button>
+            </div>
+
+            <!-- Box 3 -->
+            <div class="box-card" data-box="3" data-state="locked" role="listitem">
+              <div class="box-card__chest">
+                <div class="box-card__aura" aria-hidden="true"></div>
+                <div class="box-card__lid" aria-hidden="true">
+                  <span class="box-card__lock">🔒</span>
+                </div>
+                <div class="box-card__body">
+                  <span class="box-card__icon" aria-hidden="true">🤝</span>
+                </div>
+              </div>
+              <div class="box-card__info">
+                <span class="box-card__num">Box III</span>
+                <span class="box-card__label">Relationships</span>
+              </div>
+              <button type="button" class="box-card__btn btn-outline" data-box-action="3" disabled aria-disabled="true" aria-label="Box 3: Relationships (Locked)">
+                Locked
+              </button>
+            </div>
+
+            <!-- Box 4 -->
+            <div class="box-card" data-box="4" data-state="locked" role="listitem">
+              <div class="box-card__chest">
+                <div class="box-card__aura" aria-hidden="true"></div>
+                <div class="box-card__lid" aria-hidden="true">
+                  <span class="box-card__lock">🔒</span>
+                </div>
+                <div class="box-card__body">
+                  <span class="box-card__icon" aria-hidden="true">🌟</span>
+                </div>
+              </div>
+              <div class="box-card__info">
+                <span class="box-card__num">Box IV</span>
+                <span class="box-card__label">Experiences</span>
+              </div>
+              <button type="button" class="box-card__btn btn-outline" data-box-action="4" disabled aria-disabled="true" aria-label="Box 4: Experiences (Locked)">
+                Locked
+              </button>
+            </div>
+
+            <!-- Box 5 -->
+            <div class="box-card box-card--divine" data-box="5" data-state="locked" role="listitem">
+              <div class="box-card__chest">
+                <div class="box-card__aura" aria-hidden="true"></div>
+                <div class="box-card__lid" aria-hidden="true">
+                  <span class="box-card__lock">✨</span>
+                </div>
+                <div class="box-card__body">
+                  <span class="box-card__icon" aria-hidden="true">🦚</span>
+                </div>
+              </div>
+              <div class="box-card__info">
+                <span class="box-card__num">Box V</span>
+                <span class="box-card__label">???</span>
+              </div>
+              <button type="button" class="box-card__btn btn-outline" data-box-action="5" disabled aria-disabled="true" aria-label="Box 5: The Mystery Box (Locked)">
+                Locked
+              </button>
+            </div>
+          </div>
+
+          <div class="box-detail-card" id="box-detail-card" hidden aria-live="polite">
+            <div class="box-detail-card__header">
+              <span class="box-detail-card__icon" id="box-detail-icon" aria-hidden="true">🪙</span>
+              <div>
+                <p class="box-detail-card__kicker" id="box-detail-num">Box I Revealed</p>
+                <h3 class="box-detail-card__title" id="box-detail-title">Money &amp; Wealth</h3>
+              </div>
+            </div>
+            <p class="box-detail-card__text" id="box-detail-text"></p>
+            <button type="button" class="btn-outline box-detail-card__next" id="box-detail-next-btn">Continue to Next Box &rarr;</button>
+          </div>
+
+          <div class="soul-reveal" id="boxes-reveal" hidden tabindex="-1">
+            <p class="panel__kicker">The Question Behind Everything</p>
+            <h3 class="soul-reveal__title">Who am I, and what is the purpose of my life?</h3>
+            <p class="soul-reveal__quote">Money provided comfort, career brought recognition, relationships offered warmth, and experiences filled your days — yet after all four, a quiet longing remained. Human life is unique because only a human being can ask this ultimate question.</p>
+            <p class="soul-reveal__verse">"Athāto brahma-jijñāsā — Now, therefore, in the human form of life, one should inquire into the Absolute Truth."<br><span>— Vedanta-sūtra 1.1.1</span></p>
+
+            <button type="button" class="btn-primary" id="station2-continue-btn" style="margin-top: 1.5rem;">Continue the Journey &rarr;</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -311,6 +437,7 @@
 <script src="particles.js"></script>
 <script src="audio.js"></script>
 <script src="station1.js"></script>
+<script src="station2.js"></script>
 <script src="app.js"></script>
 <script>
   // TEMP: wires the dev audio panel above. Delete this block together with

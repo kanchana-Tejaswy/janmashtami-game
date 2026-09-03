@@ -753,3 +753,245 @@ button { font-family: inherit; cursor: pointer; }
   .ambient-toggle__label { display: none; }
   .ambient-toggle { padding: 0.5rem; }
 }
+
+/* ============================================================
+   STATION 2 — MYSTERY BOXES (Activity B)
+   ============================================================ */
+.boxes-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.boxes-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.85rem;
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+  .boxes-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.65rem;
+  }
+}
+
+@media (max-width: 440px) {
+  .boxes-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .boxes-grid .box-card:nth-child(5) { grid-column: 1 / span 2; }
+}
+
+.box-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: rgba(13, 40, 71, 0.6);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: 18px;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  transition: border-color 0.3s var(--ease-soft), background 0.3s var(--ease-soft), transform 0.25s var(--ease-soft), box-shadow 0.3s var(--ease-soft), opacity 0.3s var(--ease-soft);
+  position: relative;
+}
+
+/* State: Locked */
+.box-card[data-state="locked"] {
+  opacity: 0.55;
+  border-color: rgba(245, 158, 11, 0.15);
+  background: rgba(6, 16, 36, 0.4);
+}
+
+/* State: Ready (unlocked & available to open) */
+.box-card[data-state="ready"] {
+  opacity: 1;
+  border-color: var(--gold-300);
+  background: linear-gradient(160deg, rgba(13, 40, 71, 0.85), rgba(245, 158, 11, 0.12));
+  box-shadow: 0 0 18px rgba(245, 158, 11, 0.35);
+  animation: box-ready-pulse 2.4s var(--ease-soft) infinite;
+}
+
+.box-card[data-state="ready"]:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.55);
+}
+
+/* State: Opening */
+.box-card[data-state="opening"] {
+  animation: box-opening-shake 0.5s var(--ease-soft);
+  border-color: var(--gold-100);
+  box-shadow: 0 0 30px rgba(254, 240, 138, 0.8);
+}
+
+/* State: Opened */
+.box-card[data-state="opened"] {
+  opacity: 0.85;
+  border-color: rgba(20, 184, 166, 0.4);
+  background: rgba(20, 184, 166, 0.08);
+}
+
+/* Box 5 Divine styling */
+.box-card--divine[data-state="ready"] {
+  border-color: var(--gold-100);
+  background: linear-gradient(160deg, rgba(20, 184, 166, 0.25), rgba(245, 158, 11, 0.25));
+  box-shadow: 0 0 24px rgba(254, 240, 138, 0.5);
+}
+
+@keyframes box-ready-pulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 22px rgba(245, 158, 11, 0.6); }
+}
+
+@keyframes box-opening-shake {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  20% { transform: scale(1.05) rotate(-3deg); }
+  40% { transform: scale(1.08) rotate(3deg); }
+  60% { transform: scale(1.05) rotate(-2deg); }
+  80% { transform: scale(1.03) rotate(1deg); }
+}
+
+/* Chest Graphic */
+.box-card__chest {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.4rem;
+  cursor: pointer;
+}
+
+.box-card__aura {
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.3), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s var(--ease-soft), transform 0.3s var(--ease-soft);
+}
+
+.box-card[data-state="ready"] .box-card__aura { opacity: 1; }
+.box-card[data-state="opening"] .box-card__aura { opacity: 1; transform: scale(1.4); }
+
+.box-card__lid {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 0.75rem;
+  line-height: 1;
+  z-index: 2;
+}
+
+.box-card__lock {
+  display: inline-block;
+  background: rgba(6, 16, 36, 0.75);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 50%;
+  padding: 0.15rem 0.25rem;
+}
+
+.box-card__body {
+  position: relative;
+  z-index: 1;
+  font-size: 1.8rem;
+  line-height: 1;
+  transition: transform 0.3s var(--ease-soft);
+}
+
+.box-card[data-state="ready"]:hover .box-card__body {
+  transform: scale(1.15);
+}
+
+.box-card__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.box-card__num {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 0.78rem;
+  color: var(--ivory-dim);
+}
+
+.box-card__label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ivory);
+}
+
+.box-card__btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.78rem;
+  width: 100%;
+  white-space: nowrap;
+}
+
+.box-card[data-state="ready"] .box-card__btn {
+  background: linear-gradient(180deg, var(--gold-300), var(--gold-600));
+  color: var(--peacock-950);
+  border: none;
+  font-weight: 600;
+}
+
+/* Detail Card shown when Box 1–4 opened */
+.box-detail-card {
+  width: 100%;
+  max-width: 540px;
+  margin-top: var(--space-2);
+  background: linear-gradient(160deg, rgba(13, 40, 71, 0.9), rgba(6, 16, 36, 0.95));
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 20px;
+  padding: var(--space-3) var(--space-3);
+  text-align: left;
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  animation: rise 0.4s var(--ease-soft);
+}
+
+.box-detail-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.box-detail-card__icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.box-detail-card__kicker {
+  font-family: var(--font-quote);
+  font-style: italic;
+  color: var(--teal-400);
+  font-size: 0.9rem;
+}
+
+.box-detail-card__title {
+  font-size: 1.3rem;
+  color: var(--gold-100);
+}
+
+.box-detail-card__text {
+  color: var(--ivory-dim);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: var(--space-3);
+}
+
+.box-detail-card__next {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+}
+
