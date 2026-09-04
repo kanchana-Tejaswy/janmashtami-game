@@ -424,9 +424,8 @@
       <p class="panel__kicker">Station III</p>
       <h2 class="panel__title">What Really Makes Me Happy?</h2>
       <p class="panel__intro">
-        Some happiness rises and falls with what happens around us.<br>
-        Some happiness remains steady within.<br>
-        <span class="panel__intro-callout">Let’s experience the difference. Take the journey and discover for yourself.</span>
+        We all want to be happy.<br>
+        <span class="panel__intro-callout">But what really makes us happy?</span>
       </p>
 
       <div class="panel__body">
@@ -434,16 +433,16 @@
           
           <!-- Subtle Journey Progress Indicator -->
           <div class="journey-phase-track" id="journey-phase-track" aria-label="Journey Phases">
-            <span class="journey-phase-label">YOUR JOURNEY</span>
+            <span class="journey-phase-label" id="journey-phase-step-counter">YOUR RIDE</span>
             <div class="journey-phase-nodes">
               <div class="phase-node is-active" id="phase-node-rise" data-phase="rise">
                 <span class="phase-dot"></span>
-                <span class="phase-text">Rise</span>
+                <span class="phase-text">Temporary Highs</span>
               </div>
               <span class="phase-line" id="phase-line-1"></span>
               <div class="phase-node" id="phase-node-drop" data-phase="drop">
                 <span class="phase-dot"></span>
-                <span class="phase-text">Waves</span>
+                <span class="phase-text">Life Changes</span>
               </div>
               <span class="phase-line" id="phase-line-2"></span>
               <div class="phase-node" id="phase-node-stable" data-phase="stable">
@@ -574,22 +573,24 @@
             <p class="coaster-meter-context" id="coaster-meter-context">Baseline &middot; Gentle waters</p>
           </div>
 
-          <!-- Current Stage Card (One at a time, elegant presentation) -->
+          <!-- Dedicated Journey Message Card -->
           <div class="coaster-stage-card" id="coaster-stage-card" hidden aria-live="polite">
             <div class="coaster-stage-card__header">
               <span class="coaster-stage-card__icon" id="coaster-stage-icon">🛍️</span>
               <div>
-                <span class="coaster-stage-card__badge" id="coaster-stage-status">External High</span>
-                <h3 class="coaster-stage-card__title" id="coaster-stage-title">Shopping &amp; Gadgets</h3>
+                <span class="coaster-stage-card__badge" id="coaster-stage-status">Phase 2 &middot; Temporary Happiness</span>
+                <h3 class="coaster-stage-card__title" id="coaster-stage-title">Shopping &amp; New Things</h3>
               </div>
             </div>
-            <p class="coaster-stage-card__desc" id="coaster-stage-desc">New things bring an instant surge of excitement.</p>
+            <div class="coaster-stage-card__quotes" id="coaster-stage-quotes">
+              <p class="coaster-stage-card__quote-line" id="coaster-stage-desc">&ldquo;A new thing can make us happy.&rdquo;</p>
+            </div>
+            <p class="coaster-stage-card__sub" id="coaster-stage-sub">When we get something new, excitement surges.</p>
           </div>
 
           <!-- Controls -->
           <div class="coaster-controls">
-            <button type="button" class="btn-primary" id="coaster-start-btn">Start the Coaster &rarr;</button>
-            <button type="button" class="btn-primary" id="coaster-step-btn" hidden>Step Forward &rarr;</button>
+            <button type="button" class="btn-primary" id="coaster-start-btn">START THE RIDE &rarr;</button>
           </div>
 
           <!-- Final Soul Reveal Card -->
@@ -599,7 +600,7 @@
             <p class="soul-reveal__quote">External highs rise with pleasant circumstances and plummet when life turns difficult. But the joy of spiritual connection (Atma-rati) does not depend on changing conditions — it remains eternally serene, whole, and unshakable.</p>
             <p class="soul-reveal__verse">"Yam labdhvā cāparaṁ lābhaṁ manyate nādhikaṁ tataḥ — Upon gaining this spiritual connection, one considers no other gain greater, and standing in such a position, one is never shaken, even amidst the greatest difficulty."<br><span>— Bhagavad Gita 6.22</span></p>
 
-            <button type="button" class="btn-primary" id="station3-continue-btn" onclick="if(window.VrindavanQuest) VrindavanQuest.goToStation('final');" style="margin-top: 1.5rem;">Continue the Journey &rarr;</button>
+            <button type="button" class="btn-primary" id="station3-continue-btn" onclick="if(window.VrindavanQuest) VrindavanQuest.goToStation('final');" style="margin-top: 1.5rem;">Continue to Final Station &rarr;</button>
           </div>
         </div>
       </div>

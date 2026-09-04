@@ -1720,25 +1720,43 @@ button { font-family: inherit; cursor: pointer; }
     padding: 0.22rem 0.65rem;
     max-width: 92%;
   }
+  .coaster-stage-card {
+    padding: 1.2rem 1.15rem;
+  }
+  .coaster-stage-card__quote-line {
+    font-size: 1.12rem;
+    line-height: 1.5;
+  }
+  .coaster-stage-card__quote-line.highlight {
+    font-size: 1.2rem;
+  }
+  #coaster-start-btn {
+    min-width: 240px;
+    width: 100%;
+    max-width: 320px;
+    padding: 0.8rem 1.6rem;
+    font-size: 0.98rem;
+  }
 }
 
-/* Stage Card */
+/* Dedicated Journey Message Card */
 .coaster-stage-card {
   width: 100%;
-  max-width: 540px;
-  background: linear-gradient(160deg, rgba(13, 40, 71, 0.9), rgba(6, 16, 36, 0.95));
-  border: 1px solid rgba(245, 158, 11, 0.4);
+  max-width: 580px;
+  background: linear-gradient(160deg, rgba(13, 40, 71, 0.94), rgba(6, 16, 36, 0.97));
+  border: 1px solid rgba(245, 158, 11, 0.38);
   border-radius: 20px;
-  padding: var(--space-3);
+  padding: 1.5rem 1.8rem;
   text-align: left;
-  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.65), 0 0 24px rgba(245, 158, 11, 0.15);
   animation: rise 0.4s var(--ease-soft);
+  transition: border-color 0.4s var(--ease-soft), box-shadow 0.4s var(--ease-soft);
 }
 
 .coaster-stage-card__header {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.9rem;
   margin-bottom: 0.6rem;
 }
 
@@ -1751,32 +1769,141 @@ button { font-family: inherit; cursor: pointer; }
   display: inline-block;
   font-family: var(--font-quote);
   font-style: italic;
-  font-size: 0.85rem;
+  font-size: 0.88rem;
   color: var(--gold-300);
   background: rgba(245, 158, 11, 0.12);
   border: 1px solid rgba(245, 158, 11, 0.3);
   border-radius: 999px;
-  padding: 0.15rem 0.6rem;
-  margin-bottom: 0.2rem;
+  padding: 0.18rem 0.75rem;
+  margin-bottom: 0.25rem;
+  transition: all 0.3s var(--ease-soft);
+}
+
+.coaster-stage-card__badge.badge--rise {
+  color: var(--gold-300);
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.coaster-stage-card__badge.badge--drop {
+  color: #ffedd5;
+  border-color: rgba(255, 122, 77, 0.5);
+  background: rgba(255, 122, 77, 0.15);
+}
+
+.coaster-stage-card__badge.badge--stable {
+  color: #fef08a;
+  border-color: rgba(254, 240, 138, 0.6);
+  background: rgba(20, 184, 166, 0.18);
 }
 
 .coaster-stage-card__title {
-  font-size: 1.3rem;
+  font-size: 1.35rem;
   color: var(--gold-100);
+  font-family: var(--font-display);
+  letter-spacing: 0.01em;
+}
+
+.coaster-stage-card__milestones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.5rem 0 0.85rem;
+}
+
+.coaster-milestone-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.82rem;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(20, 184, 166, 0.1);
+  border: 1px solid rgba(20, 184, 166, 0.28);
+  color: var(--ivory);
 }
 
 .coaster-stage-card__desc {
+  color: var(--ivory);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  letter-spacing: 0.01em;
+}
+
+.coaster-stage-card__quotes {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0.6rem 0;
+}
+
+.coaster-stage-card__quote-line {
+  font-family: var(--font-quote);
+  font-style: italic;
+  font-size: 1.25rem;
+  line-height: 1.55;
+  color: var(--gold-100);
+  margin: 0;
+  text-shadow: 0 0 10px rgba(254, 240, 138, 0.2);
+}
+
+.coaster-stage-card__quote-line.highlight {
+  font-family: var(--font-display);
+  font-style: normal;
+  font-size: 1.32rem;
+  font-weight: 600;
+  color: #fef08a;
+  text-shadow: 0 0 18px rgba(245, 158, 11, 0.5);
+  margin-top: 0.35rem;
+  letter-spacing: 0.01em;
+}
+
+.coaster-stage-card__sub {
   color: var(--ivory-dim);
-  font-size: 1rem;
+  font-size: 0.94rem;
   line-height: 1.6;
+  margin: 0.5rem 0 0;
+  border-top: 1px solid rgba(245, 158, 11, 0.16);
+  padding-top: 0.55rem;
 }
 
 /* Controls */
 .coaster-controls {
   display: flex;
   justify-content: center;
-  gap: 1rem;
+  align-items: center;
   width: 100%;
+  margin-top: 0.4rem;
+}
+
+#coaster-start-btn {
+  min-width: 280px;
+  font-size: 1.05rem;
+  padding: 0.85rem 2.4rem;
+  box-shadow: 0 8px 26px -6px rgba(245, 158, 11, 0.65);
+  transition: transform 0.25s var(--ease-soft), box-shadow 0.25s var(--ease-soft), background 0.3s;
+}
+
+#coaster-start-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px -6px rgba(245, 158, 11, 0.85);
+}
+
+#coaster-start-btn:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 4px 16px -4px rgba(245, 158, 11, 0.6);
+}
+
+#coaster-start-btn:focus-visible {
+  outline: 2px solid var(--gold-300);
+  outline-offset: 3px;
+}
+
+#coaster-start-btn:disabled {
+  opacity: 0.72;
+  cursor: wait;
+  transform: none;
+  box-shadow: 0 4px 14px -4px rgba(245, 158, 11, 0.35);
 }
 
 /* ============================================================
