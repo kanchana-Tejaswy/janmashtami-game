@@ -423,36 +423,158 @@
     <section class="panel" id="station-3" data-active="false">
       <p class="panel__kicker">Station III</p>
       <h2 class="panel__title">What Really Makes Me Happy?</h2>
-      <p class="panel__intro">Some joy rises and falls with circumstance. Some doesn't move at all. Ride the roller coaster and feel the difference for yourself.</p>
+      <p class="panel__intro">
+        Some happiness rises and falls with what happens around us.<br>
+        Some happiness remains steady within.<br>
+        <span class="panel__intro-callout">Let’s experience the difference. Take the journey and discover for yourself.</span>
+      </p>
 
       <div class="panel__body">
         <div class="coaster-activity" id="coaster-activity">
-          <p class="spin-counter" id="coaster-counter">Click 'Start the Coaster' to experience the journey</p>
+          
+          <!-- Subtle Journey Progress Indicator -->
+          <div class="journey-phase-track" id="journey-phase-track" aria-label="Journey Phases">
+            <span class="journey-phase-label">YOUR JOURNEY</span>
+            <div class="journey-phase-nodes">
+              <div class="phase-node is-active" id="phase-node-rise" data-phase="rise">
+                <span class="phase-dot"></span>
+                <span class="phase-text">Rise</span>
+              </div>
+              <span class="phase-line" id="phase-line-1"></span>
+              <div class="phase-node" id="phase-node-drop" data-phase="drop">
+                <span class="phase-dot"></span>
+                <span class="phase-text">Waves</span>
+              </div>
+              <span class="phase-line" id="phase-line-2"></span>
+              <div class="phase-node" id="phase-node-stable" data-phase="stable">
+                <span class="phase-dot"></span>
+                <span class="phase-text">Inner Peace</span>
+              </div>
+            </div>
+          </div>
 
-          <!-- Happiness Meter -->
+          <!-- Interactive Ocean Journey Scene -->
+          <div class="coaster-track-visual ocean-stage" id="ocean-stage" aria-label="Interactive Ocean Journey: Life's Circumstances and the Boat of Happiness">
+            <!-- Sky & Horizon backdrop -->
+            <div class="ocean-sky" aria-hidden="true">
+              <span class="ocean-star ocean-star--1"></span>
+              <span class="ocean-star ocean-star--2"></span>
+              <span class="ocean-star ocean-star--3"></span>
+              <span class="ocean-star ocean-star--4"></span>
+              <span class="ocean-star ocean-star--5"></span>
+              <div class="ocean-moon" title="Spiritual Anchor">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#fef08a" opacity="0.85"/><circle cx="9" cy="12" r="7" fill="#061024"/></svg>
+              </div>
+              <div class="ocean-horizon-hills"></div>
+            </div>
+
+            <!-- In-Scene Dynamic Event Banner -->
+            <div class="ocean-event-banner" id="ocean-event-banner" aria-live="polite">
+              <span class="ocean-event-banner__dot">✦</span>
+              <span class="ocean-event-banner__text" id="ocean-event-text">Your journey begins…</span>
+            </div>
+
+            <!-- Direction Guide (subtle arrow/current indicator) -->
+            <div class="ocean-current-guide" aria-hidden="true">
+              <span>&rarr;</span>
+              <span>&rarr;</span>
+              <span>&rarr;</span>
+            </div>
+
+            <!-- Back Wave Layer -->
+            <div class="ocean-wave-layer ocean-wave--back" aria-hidden="true">
+              <svg class="ocean-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path class="wave-path-back" d="M0,45 C150,25 300,65 450,45 C600,25 750,65 900,45 C1050,25 1200,65 1200,120 L0,120 Z"/>
+              </svg>
+            </div>
+
+            <!-- Mid Wave Layer -->
+            <div class="ocean-wave-layer ocean-wave--mid" aria-hidden="true">
+              <svg class="ocean-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path class="wave-path-mid" d="M0,58 C150,75 300,40 450,60 C600,75 750,40 900,60 C1050,75 1200,40 1200,120 L0,120 Z"/>
+              </svg>
+            </div>
+
+            <!-- The Moving Boat Marker -->
+            <div class="coaster-marker ocean-boat" id="coaster-path-marker" style="left: 8%;">
+              <!-- Boat Reflection / Waterline Shadow -->
+              <div class="boat-shadow" aria-hidden="true"></div>
+              
+              <!-- Boat Wake Ripple -->
+              <div class="boat-wake" aria-hidden="true"></div>
+
+              <!-- Handcrafted Wooden Vrindavan Boat SVG -->
+              <svg class="boat-svg" viewBox="0 0 70 55" width="62" height="48" role="img" aria-label="Small wooden boat representing your happiness navigating life's waters">
+                <defs>
+                  <linearGradient id="boatHullGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#b45309"/>
+                    <stop offset="50%" stop-color="#78350f"/>
+                    <stop offset="100%" stop-color="#451a03"/>
+                  </linearGradient>
+                  <linearGradient id="pennantGrad" x1="0%" y1="0%" x2="100%" y2="50%">
+                    <stop offset="0%" stop-color="#f59e0b"/>
+                    <stop offset="100%" stop-color="#ff7a4d"/>
+                  </linearGradient>
+                  <radialGradient id="diyaGlow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#fef08a" stop-opacity="1"/>
+                    <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.8"/>
+                    <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+                  </radialGradient>
+                </defs>
+
+                <!-- Wooden Hull -->
+                <path d="M 6,34 C 16,45 52,45 64,34 C 67,29 68,24 67,22 L 5,22 C 4,25 4,29 6,34 Z" fill="url(#boatHullGrad)"/>
+                
+                <!-- Gold Upper Rim / Gunwale -->
+                <path d="M 4,22 Q 35,26 67,22" stroke="#fbbf24" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+                
+                <!-- Ornamental Lotus Prow -->
+                <path d="M 67,22 Q 70,17 66,13 Q 63,16 64,22" fill="#f59e0b"/>
+
+                <!-- Mast -->
+                <line x1="33" y1="22" x2="33" y2="4" stroke="#d97706" stroke-width="2.4" stroke-linecap="round"/>
+                
+                <!-- Rigging stay lines -->
+                <line x1="33" y1="5" x2="10" y2="22" stroke="rgba(251, 191, 36, 0.45)" stroke-width="1"/>
+                <line x1="33" y1="5" x2="60" y2="22" stroke="rgba(251, 191, 36, 0.45)" stroke-width="1"/>
+
+                <!-- Fluttering Saffron Pennant / Sail -->
+                <path class="boat-sail" d="M 33,6 Q 48,10 52,14 Q 44,18 33,20 Z" fill="url(#pennantGrad)"/>
+                <circle cx="33" cy="4" r="1.8" fill="#fbbf24"/>
+
+                <!-- Golden Diya / Lantern on Bow -->
+                <circle class="boat-diya-glow" cx="62" cy="18" r="9" fill="url(#diyaGlow)"/>
+                <circle cx="62" cy="18" r="2.4" fill="#fef08a"/>
+                <path d="M 61,16 Q 62,13 63,16 Z" fill="#ffffff"/>
+              </svg>
+            </div>
+
+            <!-- Front Wave Layer with Foam Crests -->
+            <div class="ocean-wave-layer ocean-wave--front" aria-hidden="true">
+              <svg class="ocean-wave-svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path class="wave-path-front" d="M0,70 C150,55 300,85 450,70 C600,55 750,85 900,70 C1050,55 1200,85 1200,120 L0,120 Z"/>
+                <!-- Shimmering Foam Crest Line -->
+                <path class="wave-crest-line" d="M0,70 C150,55 300,85 450,70 C600,55 750,85 900,70 C1050,55 1200,85 1200,70" stroke="rgba(254, 240, 138, 0.45)" stroke-width="1.8" fill="none"/>
+              </svg>
+            </div>
+
+            <!-- Golden Divine Calm Overlay (Active in Phase 3) -->
+            <div class="ocean-golden-calm" id="ocean-golden-calm" aria-hidden="true"></div>
+          </div>
+
+          <!-- Human-Friendly Happiness Meter -->
           <div class="coaster-meter-container" aria-label="Happiness Meter">
             <div class="coaster-meter-header">
-              <span class="coaster-meter-title">Happiness Meter</span>
-              <span class="coaster-meter-val" id="coaster-meter-text">50% &middot; Baseline</span>
+              <span class="coaster-meter-title">HAPPINESS</span>
+              <span class="coaster-meter-val" id="coaster-meter-text">50%</span>
             </div>
             <div class="coaster-meter-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
               <div class="coaster-meter-fill" id="coaster-meter-fill" style="width: 50%;"></div>
             </div>
+            <p class="coaster-meter-context" id="coaster-meter-context">Baseline &middot; Gentle waters</p>
           </div>
 
-          <!-- Roller Coaster SVG Path Graphic -->
-          <div class="coaster-track-visual" aria-hidden="true">
-            <svg viewBox="0 0 600 120" preserveAspectRatio="none" class="coaster-svg">
-              <line x1="0" y1="60" x2="600" y2="60" stroke="rgba(245,158,11,0.15)" stroke-dasharray="4,4"/>
-              <path d="M 0,90 Q 150,10 300,15 T 450,110 Q 500,60 600,60" fill="none" stroke="rgba(245,158,11,0.35)" stroke-width="3"/>
-              <line x1="480" y1="60" x2="600" y2="60" stroke="#14b8a6" stroke-width="4" stroke-linecap="round"/>
-            </svg>
-            <div class="coaster-marker" id="coaster-path-marker" style="left: 0%;">
-              <span class="coaster-marker__dot">🎢</span>
-            </div>
-          </div>
-
-          <!-- Current Stage Card -->
+          <!-- Current Stage Card (One at a time, elegant presentation) -->
           <div class="coaster-stage-card" id="coaster-stage-card" hidden aria-live="polite">
             <div class="coaster-stage-card__header">
               <span class="coaster-stage-card__icon" id="coaster-stage-icon">🛍️</span>
@@ -461,7 +583,7 @@
                 <h3 class="coaster-stage-card__title" id="coaster-stage-title">Shopping &amp; Gadgets</h3>
               </div>
             </div>
-            <p class="coaster-stage-card__desc" id="coaster-stage-desc">New clothes and gadgets bring an immediate splash of excitement!</p>
+            <p class="coaster-stage-card__desc" id="coaster-stage-desc">New things bring an instant surge of excitement.</p>
           </div>
 
           <!-- Controls -->

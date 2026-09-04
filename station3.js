@@ -16,9 +16,10 @@ const Station3 = (() => {
       phase: "rise",
       icon: "🛍️",
       title: "Shopping & Gadgets",
-      desc: "New clothes and gadgets bring a instant surge of excitement and joy!",
+      desc: "New things bring an instant surge of excitement.",
       meter: 65,
-      meterLabel: "65% — Material Surge",
+      meterLabel: "65%",
+      context: "Rising with circumstances…",
       status: "External High",
       sfx: "chime",
     },
@@ -26,10 +27,11 @@ const Station3 = (() => {
       id: 1,
       phase: "rise",
       icon: "📱",
-      title: "Likes & Social Media",
-      desc: "The notification bell rings! Online validation and praise fill your screen.",
+      title: "Likes & Praise",
+      desc: "Online validation makes you feel noticed and admired.",
       meter: 80,
-      meterLabel: "80% — Social Validation",
+      meterLabel: "80%",
+      context: "Rising with circumstances…",
       status: "External High",
       sfx: "chime",
     },
@@ -37,10 +39,11 @@ const Station3 = (() => {
       id: 2,
       phase: "rise",
       icon: "💰",
-      title: "Money & Wealth",
-      desc: "Bank balance grows. Financial security brings confidence and comfort.",
+      title: "Money & Security",
+      desc: "Financial comfort brings confidence and freedom.",
       meter: 90,
-      meterLabel: "90% — Wealth Security",
+      meterLabel: "90%",
+      context: "Rising with circumstances…",
       status: "External High",
       sfx: "chime",
     },
@@ -49,9 +52,10 @@ const Station3 = (() => {
       phase: "rise",
       icon: "💼",
       title: "Career Success",
-      desc: "Promotion achieved! Recognition and status among peers feel empowering.",
+      desc: "Achievement feels empowering and celebrated.",
       meter: 95,
-      meterLabel: "95% — Peak Status",
+      meterLabel: "95%",
+      context: "Rising with circumstances…",
       status: "External High",
       sfx: "chime",
     },
@@ -59,11 +63,12 @@ const Station3 = (() => {
       id: 4,
       phase: "rise",
       icon: "❤️",
-      title: "Relationships & Family",
-      desc: "Surrounded by loved ones at the top of the coaster. Everything feels perfect!",
+      title: "Loving Bonds",
+      desc: "Surrounded by loved ones, everything feels complete.",
       meter: 98,
-      meterLabel: "98% — Material Peak!",
-      status: "Coaster Peak",
+      meterLabel: "98%",
+      context: "Peak of external circumstances",
+      status: "Peak Joy",
       sfx: "flute",
     },
 
@@ -72,33 +77,36 @@ const Station3 = (() => {
       id: 5,
       phase: "drop",
       icon: "💥",
-      title: "Phone Breaks & Tech Glitch",
-      desc: "CRASH! Screen shatters, digital connection vanishes. Instant anxiety sets in.",
+      title: "Sudden Loss",
+      desc: "A broken device disrupts your day and brings instant stress.",
       meter: 70,
-      meterLabel: "70% — Sudden Glitch",
-      status: "Turbulence",
+      meterLabel: "70%",
+      context: "Circumstances changed…",
+      status: "Circumstances Change",
       sfx: "whoosh",
     },
     {
       id: 6,
       phase: "drop",
       icon: "💼",
-      title: "Corporate Layoff / Job Loss",
-      desc: "Restructuring notice arrives. The position and badge you relied on are gone.",
+      title: "Job Uncertainty",
+      desc: "The role and identity you relied on suddenly disappear.",
       meter: 45,
-      meterLabel: "45% — Status Lost",
-      status: "Turbulence",
+      meterLabel: "45%",
+      context: "Circumstances changed…",
+      status: "Circumstances Change",
       sfx: "whoosh",
     },
     {
       id: 7,
       phase: "drop",
       icon: "💔",
-      title: "Relationship Strain",
-      desc: "Misunderstanding strikes. Warmth turns into distance and emotional conflict.",
+      title: "Heartbreak & Strain",
+      desc: "Misunderstandings turn closeness into painful distance.",
       meter: 25,
-      meterLabel: "25% — Heartbreak",
-      status: "Turbulence",
+      meterLabel: "25%",
+      context: "Circumstances changed…",
+      status: "Circumstances Change",
       sfx: "whoosh",
     },
     {
@@ -106,10 +114,11 @@ const Station3 = (() => {
       phase: "drop",
       icon: "💸",
       title: "Financial Difficulty",
-      desc: "Market dip and unexpected expenses! The coaster plummets to near zero.",
+      desc: "Unexpected losses shake your comfort to the core.",
       meter: 10,
-      meterLabel: "10% — Coaster Drop!",
-      status: "Bottom Dip",
+      meterLabel: "10%",
+      context: "When external props are shaken…",
+      status: "Deepest Dip",
       sfx: "whoosh",
     },
 
@@ -118,10 +127,11 @@ const Station3 = (() => {
       id: 9,
       phase: "stable",
       icon: "🧘",
-      title: "Inner Peace (Equanimity)",
-      desc: "Taking a deep breath. Stepping back to observe life's ups and downs without being defined by them.",
+      title: "Inner Peace",
+      desc: "Taking a deep breath. Quietly observing life without being shaken.",
       meter: 80,
-      meterLabel: "80% — Stabilizing...",
+      meterLabel: "80%",
+      context: "Finding steady inner stability…",
       status: "Inner Anchor",
       sfx: "chime",
     },
@@ -130,20 +140,23 @@ const Station3 = (() => {
       phase: "stable",
       icon: "🪷",
       title: "Spiritual Connection",
-      desc: "Reconnecting with the eternal soul within and Lord Krishna. Unshakable, steady joy that never moves.",
+      desc: "Anchoring in the eternal soul and Lord Krishna. Joy that never leaves.",
       meter: 100,
-      meterLabel: "100% — Eternally Stable",
+      meterLabel: "100%",
+      context: "Eternally steady within",
       status: "Unshakable Joy",
       sfx: "celebration",
     },
   ];
 
   const TOTAL_STEPS = STEPS.length;
+  const STEP_DURATION_MS = 1600; // Pacing calibrated for all age groups
 
   const state = {
-    currentStep: -1, // -1 means not started yet
-    isAnimating: false,
+    currentStep: -1,
+    isRunning: false,
     completed: false,
+    timerId: null,
   };
 
   const els = {};
@@ -152,7 +165,6 @@ const Station3 = (() => {
     els.root = document.getElementById("station-3");
     els.startBtn = document.getElementById("coaster-start-btn");
     els.stepBtn = document.getElementById("coaster-step-btn");
-    els.resetBtn = document.getElementById("coaster-reset-btn");
     els.stageCard = document.getElementById("coaster-stage-card");
     els.stageIcon = document.getElementById("coaster-stage-icon");
     els.stageTitle = document.getElementById("coaster-stage-title");
@@ -160,22 +172,34 @@ const Station3 = (() => {
     els.stageStatus = document.getElementById("coaster-stage-status");
     els.meterFill = document.getElementById("coaster-meter-fill");
     els.meterText = document.getElementById("coaster-meter-text");
+    els.meterContext = document.getElementById("coaster-meter-context");
     els.pathMarker = document.getElementById("coaster-path-marker");
     els.reveal = document.getElementById("station3-reveal");
     els.continueBtn = document.getElementById("station3-continue-btn");
-    els.stepCounter = document.getElementById("coaster-counter");
+    els.oceanStage = document.getElementById("ocean-stage");
+    els.oceanEventBanner = document.getElementById("ocean-event-banner");
+    els.oceanEventText = document.getElementById("ocean-event-text");
+
+    // Journey phase nodes
+    els.phaseNodeRise = document.getElementById("phase-node-rise");
+    els.phaseNodeDrop = document.getElementById("phase-node-drop");
+    els.phaseNodeStable = document.getElementById("phase-node-stable");
+    els.phaseLine1 = document.getElementById("phase-line-1");
+    els.phaseLine2 = document.getElementById("phase-line-2");
   }
 
   function updateMeter(stepData) {
     if (!els.meterFill || !els.meterText) return;
 
     const val = stepData ? stepData.meter : 50;
-    const label = stepData ? stepData.meterLabel : "50% — Baseline";
+    const label = stepData ? stepData.meterLabel : "50%";
+    const context = stepData ? stepData.context : "Baseline · Gentle waters";
 
     els.meterFill.style.width = `${val}%`;
     els.meterText.textContent = label;
+    if (els.meterContext) els.meterContext.textContent = context;
 
-    // Color feedback based on phase
+    // Color gradient based on phase
     if (!stepData) {
       els.meterFill.style.background = "linear-gradient(90deg, var(--gold-500), var(--gold-300))";
     } else if (stepData.phase === "rise") {
@@ -189,28 +213,74 @@ const Station3 = (() => {
 
   function updateMarker(stepIndex) {
     if (!els.pathMarker) return;
-    // Map 0..10 step index to percentage offset along the coaster path
-    const pct = stepIndex < 0 ? 0 : Math.min(100, (stepIndex / (TOTAL_STEPS - 1)) * 100);
+    if (stepIndex < 0) {
+      els.pathMarker.style.left = "8%";
+      return;
+    }
+    const pct = 8 + (stepIndex / (TOTAL_STEPS - 1)) * 82;
     els.pathMarker.style.left = `${pct}%`;
   }
 
-  function updateCounter(stepIndex) {
-    if (!els.stepCounter) return;
-    if (stepIndex < 0) {
-      els.stepCounter.textContent = "Click 'Ride the Coaster' to experience the journey";
-    } else {
-      els.stepCounter.textContent = `Stage ${stepIndex + 1} of ${TOTAL_STEPS} \u00b7 ${STEPS[stepIndex].status}`;
+  function updatePhaseIndicator(stepData) {
+    const riseNode = els.phaseNodeRise;
+    const dropNode = els.phaseNodeDrop;
+    const stableNode = els.phaseNodeStable;
+    const line1 = els.phaseLine1;
+    const line2 = els.phaseLine2;
+
+    if (!riseNode || !dropNode || !stableNode) return;
+
+    [riseNode, dropNode, stableNode].forEach((n) => {
+      n.classList.remove("is-active", "is-passed");
+    });
+    if (line1) line1.classList.remove("is-passed");
+    if (line2) line2.classList.remove("is-passed");
+
+    if (!stepData || stepData.phase === "rise") {
+      riseNode.classList.add("is-active");
+    } else if (stepData.phase === "drop") {
+      riseNode.classList.add("is-passed");
+      if (line1) line1.classList.add("is-passed");
+      dropNode.classList.add("is-active");
+    } else if (stepData.phase === "stable") {
+      riseNode.classList.add("is-passed");
+      if (line1) line1.classList.add("is-passed");
+      dropNode.classList.add("is-passed");
+      if (line2) line2.classList.add("is-passed");
+      stableNode.classList.add("is-active");
+    }
+  }
+
+  function updateOceanScene(stepData) {
+    if (!els.oceanStage) return;
+
+    els.oceanStage.classList.remove("ocean--rise", "ocean--drop", "ocean--stable");
+
+    if (!stepData) {
+      if (els.oceanEventText) els.oceanEventText.textContent = "Your journey begins…";
+      return;
+    }
+
+    if (stepData.phase === "rise") {
+      els.oceanStage.classList.add("ocean--rise");
+    } else if (stepData.phase === "drop") {
+      els.oceanStage.classList.add("ocean--drop");
+    } else if (stepData.phase === "stable") {
+      els.oceanStage.classList.add("ocean--stable");
+    }
+
+    if (els.oceanEventText) {
+      els.oceanEventText.textContent = `${stepData.icon} ${stepData.title}`;
     }
   }
 
   function goToStep(index) {
-    if (index < 0 || index >= TOTAL_STEPS || state.isAnimating) return;
+    if (index < 0 || index >= TOTAL_STEPS) return;
 
-    state.isAnimating = true;
     state.currentStep = index;
     const stepData = STEPS[index];
 
-    // Play SFX
+    // Sound effects
     if (window.AudioEngine) {
       if (stepData.sfx === "celebration") {
         AudioEngine.playCelebration();
@@ -223,65 +293,104 @@ const Station3 = (() => {
       }
     }
 
-    // Particle burst
+    // Milestone celebration burst
     if (window.ParticleEngine && els.stageCard) {
       const rect = els.stageCard.getBoundingClientRect();
       const xRatio = (rect.left + rect.width / 2) / window.innerWidth;
       const yRatio = (rect.top + rect.height / 2) / window.innerHeight;
-      const count = stepData.id === TOTAL_STEPS - 1 ? 120 : stepData.phase === "drop" ? 15 : 30;
+      const count = stepData.id === TOTAL_STEPS - 1 ? 120 : stepData.phase === "drop" ? 12 : 25;
       ParticleEngine.burst(xRatio, yRatio, { count });
     }
 
-    // Update UI Card
-    if (els.stageCard) els.stageCard.hidden = false;
-    if (els.stageIcon) els.stageIcon.textContent = stepData.icon;
-    if (els.stageTitle) els.stageTitle.textContent = stepData.title;
-    if (els.stageDesc) els.stageDesc.textContent = stepData.desc;
-    if (els.stageStatus) els.stageStatus.textContent = stepData.status;
+    // Update Stage Card
+    if (els.stageCard) {
+      els.stageCard.hidden = false;
+      if (els.stageIcon) els.stageIcon.textContent = stepData.icon;
+      if (els.stageTitle) els.stageTitle.textContent = stepData.title;
+      if (els.stageDesc) els.stageDesc.textContent = stepData.desc;
+      if (els.stageStatus) els.stageStatus.textContent = stepData.status;
+    }
 
     updateMeter(stepData);
     updateMarker(index);
-    updateCounter(index);
+    updatePhaseIndicator(stepData);
+    updateOceanScene(stepData);
+  }
 
-    // Update button text for next step
-    const nextIdx = index + 1;
+  function startJourney() {
+    if (state.isRunning) return;
+
+    if (window.AudioEngine) AudioEngine.playClick();
+
+    state.isRunning = true;
+
+    // Button state
+    if (els.startBtn) {
+      els.startBtn.disabled = true;
+      els.startBtn.setAttribute("aria-disabled", "true");
+      els.startBtn.textContent = "The Journey Begins…";
+    }
     if (els.stepBtn) {
-      if (nextIdx < TOTAL_STEPS) {
-        const nextStep = STEPS[nextIdx];
-        if (nextStep.phase === "drop" && stepData.phase === "rise") {
-          els.stepBtn.textContent = "Enter Life's Turbulence \u2192";
-        } else if (nextStep.phase === "stable" && stepData.phase === "drop") {
-          els.stepBtn.textContent = "Find the Eternal Anchor \u2192";
-        } else {
-          els.stepBtn.textContent = `Step ${nextIdx + 1}: ${nextStep.title} \u2192`;
-        }
-        els.stepBtn.hidden = false;
+      els.stepBtn.hidden = true;
+    }
+
+    let currentIdx = 0;
+    goToStep(currentIdx);
+
+    function nextTick() {
+      if (!state.isRunning) return;
+
+      currentIdx++;
+      if (currentIdx < TOTAL_STEPS) {
+        goToStep(currentIdx);
+        state.timerId = setTimeout(nextTick, STEP_DURATION_MS);
       } else {
-        els.stepBtn.hidden = true; // All steps done
+        finishJourney();
       }
     }
 
-    if (els.startBtn) els.startBtn.hidden = true;
-
-    setTimeout(() => {
-      state.isAnimating = false;
-
-      // Final step complete -> show reveal
-      if (index === TOTAL_STEPS - 1 && !state.completed) {
-        showFinalReveal();
-      }
-    }, 450);
+    state.timerId = setTimeout(nextTick, STEP_DURATION_MS);
   }
 
-  function startCoaster() {
-    if (window.AudioEngine) AudioEngine.playClick();
-    goToStep(0);
+  function finishJourney() {
+    state.isRunning = false;
+
+    // Reset button to allow replay
+    if (els.startBtn) {
+      els.startBtn.disabled = false;
+      els.startBtn.removeAttribute("aria-disabled");
+      els.startBtn.textContent = "Replay Journey \u21BA";
+    }
+
+    // Emotional Climax statement inside the visualization
+    if (els.oceanEventText) {
+      els.oceanEventText.textContent = "\u2728 The waves changed. The boat remained.";
+    }
+
+    // Reveal Station 3 reflection card
+    showFinalReveal();
   }
 
-  function stepForward() {
-    if (window.AudioEngine) AudioEngine.playClick();
-    if (state.currentStep < TOTAL_STEPS - 1) {
-      goToStep(state.currentStep + 1);
+  function resetJourney() {
+    if (state.timerId) {
+      clearTimeout(state.timerId);
+      state.timerId = null;
+    }
+    state.isRunning = false;
+    state.currentStep = -1;
+
+    updateMeter(null);
+    updateMarker(-1);
+    updatePhaseIndicator(null);
+    updateOceanScene(null);
+
+    if (els.startBtn) {
+      els.startBtn.disabled = false;
+      els.startBtn.removeAttribute("aria-disabled");
+      els.startBtn.textContent = "Start the Coaster \u2192";
+    }
+    if (els.stageCard) {
+      els.stageCard.hidden = true;
     }
   }
 
@@ -301,11 +410,24 @@ const Station3 = (() => {
 
   function bind() {
     if (els.startBtn) {
-      els.startBtn.addEventListener("click", startCoaster);
+      els.startBtn.addEventListener("click", () => {
+        if (state.completed && state.currentStep >= TOTAL_STEPS - 1) {
+          resetJourney();
+          setTimeout(startJourney, 150);
+        } else {
+          startJourney();
+        }
+      });
     }
+
     if (els.stepBtn) {
-      els.stepBtn.addEventListener("click", stepForward);
+      els.stepBtn.addEventListener("click", () => {
+        if (state.currentStep < TOTAL_STEPS - 1) {
+          goToStep(state.currentStep + 1);
+        }
+      });
     }
+
     if (els.continueBtn) {
       els.continueBtn.addEventListener("click", () => {
         if (window.AudioEngine) AudioEngine.playClick();
@@ -322,11 +444,12 @@ const Station3 = (() => {
     if (els.meterFill) {
       updateMeter(null);
       updateMarker(-1);
-      updateCounter(-1);
+      updatePhaseIndicator(null);
+      updateOceanScene(null);
     }
   }
 
-  return { init };
+  return { init, startJourney, resetJourney, state };
 })();
 
 document.addEventListener("DOMContentLoaded", Station3.init);

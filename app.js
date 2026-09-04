@@ -183,6 +183,17 @@ const VrindavanQuest = (() => {
       const devAudio = document.querySelector(".dev-audio");
       if (devAudio) devAudio.style.setProperty("display", "block", "important");
     }
+
+    // Direct station deep-linking for testing (?station=3)
+    const stationParam = new URLSearchParams(window.location.search).get("station");
+    if (stationParam && STATIONS.includes(stationParam)) {
+      if (stationParam === "3" || stationParam === "final") {
+        state.completed.add("1");
+        state.completed.add("2");
+        if (stationParam === "final") state.completed.add("3");
+      }
+      goToStation(stationParam);
+    }
   }
 
   return { init, goToStation, markComplete, state };
