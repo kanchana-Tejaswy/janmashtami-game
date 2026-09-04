@@ -241,9 +241,4 @@ The journey is rooted in classic teachings from Indian philosophical heritage, s
    > *yasmin sthito na duḥkhena guruṇāpi vicālyate"*  
    > — *Bhagavad Gita 6.22*
 
----
 
-## 📄 License
-
-This project is open-source and available under the [MIT License](LICENSE).  
-*Created with devotion and reverence for Sri Krishna Janmashtami.*
