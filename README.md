@@ -8,7 +8,7 @@
 [![JavaScript](https://img.shields.io/badge/JavaScript-ES6+-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Web Audio API](https://img.shields.io/badge/Audio-Web_Audio_API-0ea5e9?style=flat-square)](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
 [![No Dependencies](https://img.shields.io/badge/Dependencies-Zero-emerald?style=flat-square)](#technology-stack)
-[![License: MIT](https://img.shields.io/badge/License-MIT-amber?style=flat-square)](LICENSE)
+
 
 **Journey to the Soul** is an immersive, interactive spiritual discovery web game celebrating the festival of **Janmashtami**. Set against the celestial, tranquil atmosphere of **Vrindavan**—adorned with peacock feathers, Kadamba blossoms, sacred flute melodies, and the sacred river Yamuna—this quest guides players through four contemplative stations exploring self-identity, human purpose, enduring happiness, and their eternal connection with Lord Krishna.
 
