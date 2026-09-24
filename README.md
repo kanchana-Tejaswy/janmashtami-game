@@ -62,8 +62,7 @@ The application immerses players in the sacred ambiance of Vrindavan:
 
 ```
 [Station I: Who Am I?]
-  ├── Activity A: 🎡 Identity Spin Wheel (7 Slices)
-  └── Activity B: 🧩 Remove the Layers (6 Avatar Shells)
+  └── 🧩 Remove the Layers (6 Avatar Shells)
           ↓
 [Station II: Why Is Life Special?]
   └── 🎁 The 5 Mystery Boxes (Money → Career → Bonds → Experiences → Purpose)
@@ -80,18 +79,10 @@ The application immerses players in the sacred ambiance of Vrindavan:
 ### Station I: Who Am I?
 *A deep exploration of external identity vs. the unchanging conscious observer.*
 
-Players can engage in either of two interactive discovery paths:
-
-1. **🎡 Activity A — The Identity Spin Wheel**:
-   - An interactive 7-slice wheel representing transient facets of identity: **Name**, **Age**, **Body**, **Emotions**, **Career**, **Relationships**, and **Memories**.
-   - Spinning the wheel lands on a slice and prompts the player: *"Can this change?"*
-   - Explanations reveal how our physical bodies renew their cells, names are external labels, and emotions pass like weather.
-   - After exploring slices, players unlock **The Soul Reveal**: *Something remains constant across all change—the conscious soul (Atman).*
-
-2. **🧩 Activity B — Remove the Layers**:
-   - An avatar surrounded by six peelable dimensional shells: **Body** 👗, **Emotions** 😊, **Profession** 💼, **Name** 🪪, **Identity & Status** 📱, and **Thoughts & Ego** 🧠.
-   - Tapping each layer dissolves it with golden particle effects and acoustic chimes, gradually intensifying the golden silhouette within.
-   - Peeling all layers reveals the radiant eternal self: *"If everything external is removed... who is still there?"*
+**🧩 Remove the Layers**:
+- An avatar surrounded by six peelable dimensional shells: **Body** 👗, **Emotions** 😊, **Profession** 💼, **Name** 🪪, **Identity & Status** 📱, and **Thoughts & Ego** 🧠.
+- Tapping each layer dissolves it with golden particle effects and acoustic chimes, gradually intensifying the golden silhouette within.
+- Peeling all layers reveals the radiant eternal self: *"If everything external is removed... who is still there?"*
 
 > **Sacred Reference**: *Bhagavad Gita 2.13*
 
@@ -178,7 +169,7 @@ janmashtami-game/
 ├── index.html         # Main semantic SPA layout, SVG torana, and station panels
 ├── styles.css         # Complete design system, color tokens, and animations
 ├── app.js             # Central game state coordinator & navigation guard
-├── station1.js        # Identity Spin Wheel & Remove the Layers logic
+├── station1.js        # Station 1: Remove the Layers logic
 ├── station2.js        # 5 Mystery Boxes sequence & progression logic
 ├── station3.js        # Happiness Roller Coaster timeline & meter simulation
 ├── final.js           # Mirror reveal, realization sequence & Canvas Soul Card

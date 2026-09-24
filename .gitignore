@@ -8,8 +8,13 @@ Thumbs.db
 
 # Node / Dependencies
 node_modules/
+.next/
+out/
+build/
+dist/
 
-# Local task notes
+# Local task notes & logs
 BUGS.md
 powershell.cmd
 powershell.bat
+*.log
