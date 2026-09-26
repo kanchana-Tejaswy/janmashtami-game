@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { JOURNEY_STEPS } from '@/lib/constants';
 import { JourneyStep } from '@/types';
@@ -34,18 +34,92 @@ interface Level3ContainerProps {
 }
 
 export function Level3Container({ onComplete, onContinue }: Level3ContainerProps) {
+  // Single Source of Truth for Current Journey Point (0 to 11)
   const [currentStepIdx, setCurrentStepIdx] = useState<number>(0);
+  const [isBoatMoving, setIsBoatMoving] = useState<boolean>(false);
   const [isCompleted, setIsCompleted] = useState<boolean>(false);
 
   const totalSteps = JOURNEY_STEPS.length;
   const currentStep: JourneyStep = JOURNEY_STEPS[currentStepIdx];
 
+  const movementTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const messageSectionRef = useRef<HTMLDivElement | null>(null);
+  const climaxSectionRef = useRef<HTMLDivElement | null>(null);
+
+  /**
+   * Context-aware Auto Scroll:
+   * Checks whether the target element is already comfortably visible in the viewport.
+   * If not, smoothly scrolls it into view respecting header offset and reduced-motion settings.
+   */
+  const scrollToElementIfOffscreen = useCallback(
+    (
+      element: HTMLElement | null,
+      options?: { block?: ScrollLogicalPosition; topOffset?: number; bottomMargin?: number }
+    ) => {
+      if (!element || typeof window === 'undefined') return;
+
+      const topOffset = options?.topOffset ?? 100; // Offset for sticky Torana / navigation
+      const bottomMargin = options?.bottomMargin ?? 40;
+      const rect = element.getBoundingClientRect();
+      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+
+      // Element is comfortably visible if its top is below the top header and bottom is above the viewport base
+      const isComfortablyVisible =
+        rect.top >= topOffset && rect.bottom <= (windowHeight - bottomMargin);
+
+      if (!isComfortablyVisible) {
+        const prefersReducedMotion =
+          typeof window !== 'undefined' &&
+          window.matchMedia &&
+          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        element.scrollIntoView({
+          behavior: prefersReducedMotion ? 'auto' : 'smooth',
+          block: options?.block ?? (window.innerWidth < 768 ? 'nearest' : 'center'),
+        });
+      }
+    },
+    []
+  );
+
+  const handleMovementComplete = useCallback(() => {
+    setIsBoatMoving(false);
+    if (movementTimeoutRef.current) {
+      clearTimeout(movementTimeoutRef.current);
+      movementTimeoutRef.current = null;
+    }
+
+    // Sequence: Boat reaches target -> Message reveals -> Short comfortable pause -> Context-aware smooth scroll
+    setTimeout(() => {
+      scrollToElementIfOffscreen(messageSectionRef.current, { block: 'nearest' });
+    }, 120);
+  }, [scrollToElementIfOffscreen]);
+
+  // When climax revelation is unlocked, smoothly bring it into view
+  useEffect(() => {
+    if (isCompleted && climaxSectionRef.current) {
+      const timer = setTimeout(() => {
+        scrollToElementIfOffscreen(climaxSectionRef.current, { block: 'center' });
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+  }, [isCompleted, scrollToElementIfOffscreen]);
+
   const handleNextStep = () => {
+    if (isBoatMoving) return; // Prevent conflicting animations (Option A)
+
     const nextIdx = currentStepIdx + 1;
 
     if (nextIdx < totalSteps) {
+      setIsBoatMoving(true);
       setCurrentStepIdx(nextIdx);
       const nextStep = JOURNEY_STEPS[nextIdx];
+
+      // Safety fallback timeout to ensure buttons are never locked indefinitely
+      if (movementTimeoutRef.current) clearTimeout(movementTimeoutRef.current);
+      movementTimeoutRef.current = setTimeout(() => {
+        setIsBoatMoving(false);
+      }, 900);
 
       // Play appropriate sound effect based on step phase
       if (nextStep.sfx === 'drop') {
@@ -75,16 +149,29 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
   };
 
   const handlePrevStep = () => {
+    if (isBoatMoving) return; // Prevent conflicting animations
     if (currentStepIdx > 0) {
+      setIsBoatMoving(true);
       setCurrentStepIdx(currentStepIdx - 1);
       AudioManager.getInstance().playTick({ volume: 0.15 });
+
+      if (movementTimeoutRef.current) clearTimeout(movementTimeoutRef.current);
+      movementTimeoutRef.current = setTimeout(() => {
+        setIsBoatMoving(false);
+      }, 900);
     }
   };
 
   const handleResetRide = () => {
+    setIsBoatMoving(true);
     setCurrentStepIdx(0);
     setIsCompleted(false);
     AudioManager.getInstance().playTick({ volume: 0.2 });
+
+    if (movementTimeoutRef.current) clearTimeout(movementTimeoutRef.current);
+    movementTimeoutRef.current = setTimeout(() => {
+      setIsBoatMoving(false);
+    }, 900);
   };
 
   const getStepIcon = (iconName: JourneyStep['iconName']) => {
@@ -162,16 +249,21 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
         </div>
       </div>
 
-      {/* Interactive Ocean & Buoyant Boat Canvas */}
+      {/* Interactive Ocean & Buoyant Boat Canvas with Continuous Step Progression */}
       <div className="mb-5 max-w-4xl mx-auto">
         <OceanCanvas
+          currentPointIndex={currentStepIdx}
           progressRatio={currentStep.boatProgressRatio}
           phase={currentStep.phase}
+          onMovementComplete={handleMovementComplete}
         />
       </div>
 
-      {/* Dynamic Happiness Meter & Step Detail Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch max-w-4xl mx-auto mb-6">
+      {/* Dynamic Happiness Meter & Step Detail Grid (Auto-scroll target) */}
+      <div
+        ref={messageSectionRef}
+        className="grid grid-cols-1 md:grid-cols-12 gap-4 items-stretch max-w-4xl mx-auto mb-6 scroll-mt-28"
+      >
         {/* Bottom-Left: Happiness Meter */}
         <div className="md:col-span-5 p-5 rounded-2xl bg-white/90 backdrop-blur-md border border-gold-400/30 shadow-ujwala-card flex flex-col justify-between">
           <div>
@@ -215,12 +307,12 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
               </div>
             </div>
 
-            {/* Step Controls: Previous & Next */}
+            {/* Step Controls: Previous & Next with Option A Guard */}
             <div className="flex items-center gap-2 shrink-0">
               <button
                 type="button"
                 onClick={handlePrevStep}
-                disabled={currentStepIdx === 0}
+                disabled={currentStepIdx === 0 || isBoatMoving}
                 aria-label="Previous step"
                 className="p-2 rounded-xl bg-ivory-soft hover:bg-white border border-warm-200 text-warm-700 hover:text-warm-900 transition-all disabled:opacity-30 disabled:cursor-not-allowed shadow-sm"
               >
@@ -230,13 +322,14 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
               <button
                 type="button"
                 onClick={handleNextStep}
-                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-warm-900 font-display font-bold text-xs tracking-wider uppercase transition-all duration-200 active:scale-95 shadow-ujwala-sm hover:shadow-ujwala-md"
+                disabled={isBoatMoving}
+                className="group inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-warm-900 font-display font-bold text-xs tracking-wider uppercase transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed shadow-ujwala-sm hover:shadow-ujwala-md"
                 style={{
                   background: 'linear-gradient(135deg, #FFFDF9 0%, #FAF3DC 50%, #E8D18A 100%)',
                   border: '1px solid #D6B15E',
                 }}
               >
-                <span>{currentStepIdx === totalSteps - 1 ? 'Finish' : 'Next'}</span>
+                <span>{currentStepIdx === totalSteps - 1 ? 'Finish' : isBoatMoving ? 'Sailing...' : 'Next'}</span>
                 <ChevronRight className="w-3.5 h-3.5 stroke-[2.5] transform transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
               </button>
             </div>
@@ -251,14 +344,15 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
         </div>
       </div>
 
-      {/* Climax Revelation & Reflection */}
+      {/* Climax Revelation & Reflection (Auto-scroll target on finish) */}
       <AnimatePresence>
         {isCompleted && (
           <motion.div
+            ref={climaxSectionRef}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 sm:mt-12 mb-8 py-10 px-6 sm:px-10 rounded-3xl text-center max-w-[740px] mx-auto relative overflow-hidden backdrop-blur-2xl bg-white/95 border border-gold-400/50 shadow-ujwala-lg"
+            className="mt-10 sm:mt-12 mb-8 py-10 px-6 sm:px-10 rounded-3xl text-center max-w-[740px] mx-auto relative overflow-hidden backdrop-blur-2xl bg-white/95 border border-gold-400/50 shadow-ujwala-lg scroll-mt-28"
           >
             {/* Ambient Top Glow Diffusion */}
             <div
@@ -339,4 +433,3 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
     </section>
   );
 }
-
