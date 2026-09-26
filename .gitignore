@@ -18,3 +18,5 @@ BUGS.md
 powershell.cmd
 powershell.bat
 *.log
+*.tsbuildinfo
+

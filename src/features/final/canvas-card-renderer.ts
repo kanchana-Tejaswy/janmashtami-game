@@ -16,120 +16,127 @@ export function renderSoulCardToCanvas(
 
   ctx.clearRect(0, 0, w, h);
 
-  // 1. Background Radiant Radial Gradient
+  // 1. Background Warm Ivory Radial Gradient
   const bgGrad = ctx.createRadialGradient(w / 2, h * 0.38, 120, w / 2, h / 2, 950);
-  bgGrad.addColorStop(0, theme.bgCenter);
-  bgGrad.addColorStop(0.55, theme.bgMid);
-  bgGrad.addColorStop(1, theme.bgEdge);
+  bgGrad.addColorStop(0, theme.bgCenter || '#FAF6ED');
+  bgGrad.addColorStop(0.6, theme.bgMid || '#F5ECE0');
+  bgGrad.addColorStop(1, theme.bgEdge || '#EFE3D3');
   ctx.fillStyle = bgGrad;
   ctx.fillRect(0, 0, w, h);
 
-  // Soft luminous aura
-  const auraGrad = ctx.createRadialGradient(w / 2, h * 0.42, 30, w / 2, h * 0.42, 480);
-  auraGrad.addColorStop(0, theme.auraColor);
-  auraGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.05)');
+  // Soft luminous warm golden aura in the upper center
+  const auraGrad = ctx.createRadialGradient(w / 2, h * 0.42, 20, w / 2, h * 0.42, 500);
+  auraGrad.addColorStop(0, theme.auraColor || 'rgba(214, 177, 94, 0.25)');
+  auraGrad.addColorStop(0.5, 'rgba(232, 183, 190, 0.1)');
   auraGrad.addColorStop(1, 'transparent');
   ctx.fillStyle = auraGrad;
   ctx.fillRect(0, 0, w, h);
 
   // 2. Ornate Double Gold Frame Border
-  ctx.lineWidth = 6;
-  ctx.strokeStyle = theme.primaryGold;
-  ctx.strokeRect(40, 40, w - 80, h - 80);
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = theme.primaryGold || '#D6B15E';
+  ctx.strokeRect(48, 48, w - 96, h - 96);
 
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = theme.borderInner;
-  ctx.strokeRect(52, 52, w - 104, h - 104);
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = theme.borderInner || 'rgba(214, 177, 94, 0.45)';
+  ctx.strokeRect(60, 60, w - 120, h - 120);
 
-  // Corner decorative accents
-  drawCornerAccents(ctx, w, h, theme.primaryGold);
+  // Corner decorative flourishes
+  drawCornerAccents(ctx, w, h, theme.primaryGold || '#D6B15E');
 
-  // 3. Header Title & Sacred Glyph
+  // 3. Header: UJWALA · LET YOUR LIGHT SHINE
   ctx.textAlign = 'center';
-  ctx.fillStyle = theme.accent;
+
+  ctx.fillStyle = '#756D66';
+  ctx.font = "italic 28px 'Cormorant Garamond', Georgia, serif";
+  ctx.fillText('A JOURNEY FROM WITHIN', w / 2, 130);
+
+  // Festival Identity Title
+  ctx.fillStyle = '#403A35';
+  ctx.font = "600 58px 'Cinzel', Georgia, serif";
+  ctx.fillText('UJWALA', w / 2, 200);
+
+  ctx.fillStyle = theme.primaryGold || '#D6B15E';
   ctx.font = "italic 32px 'Cormorant Garamond', Georgia, serif";
-  ctx.fillText('JANMASHTAMI SACRED KEEPSAKE', w / 2, 135);
+  ctx.fillText('LET YOUR LIGHT SHINE', w / 2, 245);
 
-  ctx.fillStyle = theme.lightGold;
-  ctx.font = "600 52px 'Cinzel', Georgia, serif";
-  ctx.fillText('JOURNEY TO THE SOUL', w / 2, 205);
+  // Golden Divider Line with Diya/Lotus Marker
+  drawGoldenDivider(ctx, w / 2, 275, 460, theme.primaryGold || '#D6B15E');
 
-  // Golden Divider Line
-  drawGoldenDivider(ctx, w / 2, 245, 420, theme.primaryGold);
-
-  // 4. Recipient Name
-  ctx.fillStyle = 'rgba(246, 241, 228, 0.8)';
-  ctx.font = "italic 36px 'Cormorant Garamond', Georgia, serif";
-  ctx.fillText('This keepsake certifies that', w / 2, 325);
+  // 4. Recipient Name Certification
+  ctx.fillStyle = '#756D66';
+  ctx.font = "italic 34px 'Cormorant Garamond', Georgia, serif";
+  ctx.fillText('This keepsake certifies that', w / 2, 350);
 
   const displayName = name.trim() || 'Sacred Seeker';
 
   // Dynamic Name Font Size to fit within 960px width
-  let nameFontSize = 74;
+  let nameFontSize = 70;
   ctx.font = `600 ${nameFontSize}px 'Cinzel', Georgia, serif`;
-  while (ctx.measureText(displayName).width > 950 && nameFontSize > 36) {
+  while (ctx.measureText(displayName).width > 920 && nameFontSize > 36) {
     nameFontSize -= 4;
     ctx.font = `600 ${nameFontSize}px 'Cinzel', Georgia, serif`;
   }
 
-  // Name Gradient Fill with gold foil
-  const nameGrad = ctx.createLinearGradient(0, 385, 0, 445);
-  nameGrad.addColorStop(0, theme.lightGold);
-  nameGrad.addColorStop(0.5, theme.primaryGold);
-  nameGrad.addColorStop(1, theme.darkGold);
+  // Name Gradient Fill with Gold Foil Sheen
+  const nameGrad = ctx.createLinearGradient(0, 390, 0, 450);
+  nameGrad.addColorStop(0, '#B8903B');
+  nameGrad.addColorStop(0.5, '#D6B15E');
+  nameGrad.addColorStop(1, '#8C6820');
   ctx.fillStyle = nameGrad;
-  ctx.shadowColor = 'rgba(245, 158, 11, 0.4)';
-  ctx.shadowBlur = 12;
-  ctx.fillText(displayName, w / 2, 415);
+  ctx.shadowColor = 'rgba(214, 177, 94, 0.35)';
+  ctx.shadowBlur = 8;
+  ctx.fillText(displayName, w / 2, 430);
   ctx.shadowBlur = 0;
 
-  ctx.fillStyle = 'rgba(246, 241, 228, 0.8)';
-  ctx.font = "italic 34px 'Cormorant Garamond', Georgia, serif";
-  ctx.fillText('has awakened to the eternal truth of consciousness:', w / 2, 485);
+  ctx.fillStyle = '#5A534C';
+  ctx.font = "italic 32px 'Cormorant Garamond', Georgia, serif";
+  ctx.fillText('has awakened to the eternal radiance of the inner self:', w / 2, 495);
 
-  // 5. Central Sacred Emblem & Declaration
-  drawLotusEmblem(ctx, w / 2, 625, theme.primaryGold, theme.lightGold);
+  // 5. Central Lotus Emblem & Declaration
+  drawLotusEmblem(ctx, w / 2, 630, theme.primaryGold || '#D6B15E', theme.lightGold || '#E8D18A');
 
-  ctx.fillStyle = theme.lightGold;
-  ctx.font = "600 76px 'Cinzel', Georgia, serif";
-  ctx.shadowColor = 'rgba(245, 158, 11, 0.75)';
-  ctx.shadowBlur = 24;
+  ctx.fillStyle = '#403A35';
+  ctx.font = "600 70px 'Cinzel', Georgia, serif";
+  ctx.shadowColor = 'rgba(214, 177, 94, 0.4)';
+  ctx.shadowBlur = 16;
   ctx.fillText('I AM THE SOUL', w / 2, 815);
   ctx.shadowBlur = 0;
 
   // 6. Selected Vedic Verse Card
-  const boxX = 90;
-  const boxY = 910;
-  const boxW = w - 180;
-  const boxH = 475;
+  const boxX = 100;
+  const boxY = 895;
+  const boxW = w - 200;
+  const boxH = 480;
 
-  ctx.fillStyle = theme.boxBg;
-  ctx.strokeStyle = theme.boxBorder;
-  ctx.lineWidth = 2;
-  drawRoundRect(ctx, boxX, boxY, boxW, boxH, 24, true, true);
+  ctx.fillStyle = theme.boxBg || 'rgba(251, 247, 239, 0.95)';
+  ctx.strokeStyle = theme.boxBorder || 'rgba(214, 177, 94, 0.4)';
+  ctx.lineWidth = 1.5;
+  drawRoundRect(ctx, boxX, boxY, boxW, boxH, 20, true, true);
 
-  ctx.fillStyle = theme.accent;
-  ctx.font = "italic 30px 'Cormorant Garamond', Georgia, serif";
-  ctx.fillText(verse.kicker, w / 2, boxY + 55);
+  // Verse Kicker
+  ctx.fillStyle = '#756D66';
+  ctx.font = "600 24px 'Cinzel', 'Trajan Pro', Georgia, serif";
+  ctx.fillText(verse.kicker, w / 2, boxY + 50);
 
   // Sanskrit Verse
-  ctx.fillStyle = theme.primaryGold;
-  ctx.font = "600 40px 'Mukta', sans-serif";
-  ctx.fillText(verse.sanskrit, w / 2, boxY + 125);
+  ctx.fillStyle = '#8C6820';
+  ctx.font = "600 38px 'Mukta', 'Noto Serif Devanagari', 'Yatra One', Georgia, serif";
+  ctx.fillText(verse.sanskrit, w / 2, boxY + 115);
 
   // English Translation
-  ctx.fillStyle = theme.textIvory;
-  ctx.font = "italic 32px 'Cormorant Garamond', Georgia, serif";
-  wrapText(ctx, verse.english, w / 2, boxY + 205, boxW - 80, 44);
+  ctx.fillStyle = '#403A35';
+  ctx.font = "italic 30px 'Cormorant Garamond', 'Garamond', Georgia, serif";
+  wrapText(ctx, verse.english, w / 2, boxY + 195, boxW - 80, 42);
 
   // Verse Citation
-  ctx.fillStyle = theme.primaryGold;
-  ctx.font = "600 28px 'Cinzel', Georgia, serif";
-  ctx.fillText(verse.citation, w / 2, boxY + 340);
+  ctx.fillStyle = '#B8903B';
+  ctx.font = "600 26px 'Cinzel', 'Trajan Pro', Georgia, serif";
+  ctx.fillText(verse.citation, w / 2, boxY + 345);
 
-  // Spiritual meaning
-  ctx.fillStyle = 'rgba(246, 241, 228, 0.75)';
-  ctx.font = "28px 'Mukta', sans-serif";
+  // Spiritual Meaning
+  ctx.fillStyle = '#756D66';
+  ctx.font = "26px 'Mukta', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
   ctx.fillText(verse.meaning, w / 2, boxY + 415);
 
   // 7. Footer Seal & Date
@@ -138,9 +145,9 @@ export function renderSoulCardToCanvas(
     month: 'long',
     day: 'numeric',
   });
-  ctx.fillStyle = 'rgba(246, 241, 228, 0.5)';
-  ctx.font = "24px 'Mukta', sans-serif";
-  ctx.fillText(`Vrindavan Quest · Janmashtami Keepsake · ${today}`, w / 2, 1495);
+  ctx.fillStyle = '#756D66';
+  ctx.font = "22px 'Mukta', 'Cormorant Garamond', Georgia, serif";
+  ctx.fillText(`UJWALA Festival · Let Your Light Shine · ${today}`, w / 2, 1495);
 }
 
 function drawCornerAccents(
@@ -150,23 +157,23 @@ function drawCornerAccents(
   strokeColor: string
 ) {
   const corners = [
-    { x: 52, y: 52, dx: 1, dy: 1 },
-    { x: w - 52, y: 52, dx: -1, dy: 1 },
-    { x: 52, y: h - 52, dx: 1, dy: -1 },
-    { x: w - 52, y: h - 52, dx: -1, dy: -1 },
+    { x: 60, y: 60, dx: 1, dy: 1 },
+    { x: w - 60, y: 60, dx: -1, dy: 1 },
+    { x: 60, y: h - 60, dx: 1, dy: -1 },
+    { x: w - 60, y: h - 60, dx: -1, dy: -1 },
   ];
   ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 3.5;
+  ctx.lineWidth = 2.5;
   corners.forEach((c) => {
     ctx.beginPath();
-    ctx.moveTo(c.x, c.y + c.dy * 36);
+    ctx.moveTo(c.x, c.y + c.dy * 32);
     ctx.lineTo(c.x, c.y);
-    ctx.lineTo(c.x + c.dx * 36, c.y);
+    ctx.lineTo(c.x + c.dx * 32, c.y);
     ctx.stroke();
 
     ctx.fillStyle = strokeColor;
     ctx.beginPath();
-    ctx.arc(c.x + c.dx * 12, c.y + c.dy * 12, 3.5, 0, Math.PI * 2);
+    ctx.arc(c.x + c.dx * 10, c.y + c.dy * 10, 3, 0, Math.PI * 2);
     ctx.fill();
   });
 }
@@ -179,20 +186,21 @@ function drawGoldenDivider(
   strokeColor: string
 ) {
   ctx.strokeStyle = strokeColor;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 1.5;
   ctx.beginPath();
   ctx.moveTo(cx - width / 2, cy);
-  ctx.lineTo(cx - 30, cy);
-  ctx.moveTo(cx + 30, cy);
+  ctx.lineTo(cx - 24, cy);
+  ctx.moveTo(cx + 24, cy);
   ctx.lineTo(cx + width / 2, cy);
   ctx.stroke();
 
+  // Central delicate diamond glyph
   ctx.fillStyle = strokeColor;
   ctx.beginPath();
-  ctx.moveTo(cx, cy - 8);
-  ctx.lineTo(cx + 8, cy);
-  ctx.lineTo(cx, cy + 8);
-  ctx.lineTo(cx - 8, cy);
+  ctx.moveTo(cx, cy - 6);
+  ctx.lineTo(cx + 6, cy);
+  ctx.lineTo(cx, cy + 6);
+  ctx.lineTo(cx - 6, cy);
   ctx.closePath();
   ctx.fill();
 }
@@ -207,32 +215,35 @@ function drawLotusEmblem(
   ctx.save();
   ctx.translate(cx, cy);
 
+  // Outer radiant ring
   ctx.strokeStyle = goldColor;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2;
   ctx.beginPath();
-  ctx.arc(0, 0, 80, 0, Math.PI * 2);
+  ctx.arc(0, 0, 76, 0, Math.PI * 2);
   ctx.stroke();
 
-  ctx.lineWidth = 1.5;
+  ctx.lineWidth = 1;
   ctx.beginPath();
-  ctx.arc(0, 0, 92, 0, Math.PI * 2);
+  ctx.arc(0, 0, 86, 0, Math.PI * 2);
   ctx.stroke();
 
+  // 8 Petals
   for (let i = 0; i < 8; i++) {
     ctx.save();
     ctx.rotate((i * Math.PI) / 4);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    ctx.quadraticCurveTo(24, -45, 0, -68);
-    ctx.quadraticCurveTo(-24, -45, 0, 0);
+    ctx.quadraticCurveTo(20, -40, 0, -60);
+    ctx.quadraticCurveTo(-20, -40, 0, 0);
     ctx.fillStyle = goldColor;
-    ctx.globalAlpha = 0.85;
+    ctx.globalAlpha = 0.8;
     ctx.fill();
     ctx.restore();
   }
 
+  // Central golden core
   ctx.beginPath();
-  ctx.arc(0, 0, 16, 0, Math.PI * 2);
+  ctx.arc(0, 0, 14, 0, Math.PI * 2);
   ctx.fillStyle = lightColor;
   ctx.globalAlpha = 1;
   ctx.fill();

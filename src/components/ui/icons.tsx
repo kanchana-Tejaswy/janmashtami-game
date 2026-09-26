@@ -33,6 +33,11 @@ import {
   RotateCcw,
   Sparkle,
   Flame,
+  ArrowRight,
+  ArrowLeft,
+  Circle,
+  Eye,
+  Layers,
 } from 'lucide-react';
 
 export {
@@ -67,53 +72,107 @@ export {
   RotateCcw,
   Sparkle,
   Flame,
+  ArrowRight,
+  ArrowLeft,
+  Circle,
+  Eye,
+  Layers,
 };
 
 /**
- * Bespoke Peacock Feather Icon (SVG)
- * Sacred Janmashtami / Vrindavan Emblem
+ * UJWALA Radiance Line-Art Emblem
+ * Minimal, delicate inner light burst
  */
-export function PeacockFeatherIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
+export function UjwalaRadianceIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
   return (
-    <svg viewBox="0 0 60 100" fill="none" className={className} aria-hidden="true" {...props}>
-      <path d="M30,95 C30,70 20,60 30,10" stroke="#14b8a6" strokeWidth="2.5" strokeLinecap="round" />
-      <ellipse cx="30" cy="22" rx="18" ry="24" fill="#00695c" opacity="0.9" />
-      <ellipse cx="30" cy="22" rx="12" ry="16" fill="#0d9488" />
-      <ellipse cx="30" cy="22" rx="7" ry="10" fill="#f59e0b" />
-      <circle cx="30" cy="22" r="3.2" fill="#061024" />
-      <circle cx="28.8" cy="20.8" r="1.1" fill="#fef08a" />
-      {/* Delicate feather barbs */}
-      <path d="M22,32 C12,42 8,56 12,68" stroke="#14b8a6" strokeWidth="1.2" opacity="0.75" />
-      <path d="M38,32 C48,42 52,56 48,68" stroke="#14b8a6" strokeWidth="1.2" opacity="0.75" />
-      <path d="M25,48 C16,60 14,74 20,84" stroke="#00695c" strokeWidth="1" opacity="0.6" />
-      <path d="M35,48 C44,60 46,74 40,84" stroke="#00695c" strokeWidth="1" opacity="0.6" />
+    <svg viewBox="0 0 40 40" fill="none" className={className} aria-hidden="true" {...props}>
+      <circle cx="20" cy="20" r="3.5" fill="#D6B15E" />
+      <circle cx="20" cy="20" r="7" stroke="#D6B15E" strokeWidth="1" strokeDasharray="2 2" opacity="0.8" />
+      <path d="M20 4V10M20 30V36M4 20H10M30 20H36M8.68 8.68L12.92 12.92M27.08 27.08L31.32 31.32M8.68 31.32L12.92 27.08M27.08 12.92L31.32 8.68" stroke="#D6B15E" strokeWidth="1.2" strokeLinecap="round" opacity="0.85" />
     </svg>
   );
 }
 
 /**
- * Sacred Golden Bansuri Flute Icon (SVG)
+ * Delicate Lotus Line-Art (Feminine, minimal, spiritual)
+ */
+export function LotusLineArt({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 48 40" fill="none" className={className} aria-hidden="true" {...props}>
+      {/* Central petal */}
+      <path d="M24 6 C21 15 20 25 24 34 C28 25 27 15 24 6 Z" stroke="#E8B7BE" strokeWidth="1.25" fill="#FDF7F8" fillOpacity="0.8" />
+      {/* Inner left petal */}
+      <path d="M22 12 C16 19 15 26 21 34 C22 26 22 18 22 12 Z" stroke="#D6B15E" strokeWidth="1.1" fill="#FAF2F4" fillOpacity="0.5" />
+      {/* Inner right petal */}
+      <path d="M26 12 C32 19 33 26 27 34 C26 26 26 18 26 12 Z" stroke="#D6B15E" strokeWidth="1.1" fill="#FAF2F4" fillOpacity="0.5" />
+      {/* Outer wings */}
+      <path d="M17 19 C10 24 9 30 19 34 C17 27 17 23 17 19 Z" stroke="#E8B7BE" strokeWidth="1" strokeLinecap="round" />
+      <path d="M31 19 C38 24 39 30 29 34 C31 27 31 23 31 19 Z" stroke="#E8B7BE" strokeWidth="1" strokeLinecap="round" />
+      {/* Base water line */}
+      <path d="M12 36 C18 38 30 38 36 36" stroke="#D6B15E" strokeWidth="1" strokeLinecap="round" opacity="0.6" />
+    </svg>
+  );
+}
+
+/**
+ * Sacred Diya Line-Art (Warm, subtle flame)
+ */
+export function DiyaLineArt({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 40 40" fill="none" className={className} aria-hidden="true" {...props}>
+      <defs>
+        <radialGradient id="diyaGlow" cx="50%" cy="40%" r="50%">
+          <stop offset="0%" stopColor="#FFF2B2" />
+          <stop offset="60%" stopColor="#E8D18A" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#D6B15E" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      {/* Flame */}
+      <path d="M20 7 C17 14 17 17 20 22 C23 17 23 14 20 7 Z" fill="url(#diyaGlow)" stroke="#D6B15E" strokeWidth="1" />
+      <circle cx="20" cy="18" r="1.5" fill="#FFFDF9" />
+      {/* Diya Bowl Line */}
+      <path d="M10 23 C10 30 30 30 30 23 C26 25 14 25 10 23 Z" stroke="#C49B45" strokeWidth="1.25" fill="#FAF5EB" />
+      <path d="M14 30 L26 30" stroke="#C49B45" strokeWidth="1.25" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+/**
+ * Refined Peacock Feather Line-Art (Delicate, spiritual accent)
+ */
+export function PeacockFeatherIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 60 100" fill="none" className={className} aria-hidden="true" {...props}>
+      <path d="M30 95 C30 70 24 55 30 15" stroke="#24566A" strokeWidth="1.5" strokeLinecap="round" opacity="0.75" />
+      <ellipse cx="30" cy="26" rx="16" ry="20" stroke="#D6B15E" strokeWidth="1.2" fill="#FAF6ED" />
+      <ellipse cx="30" cy="26" rx="10" ry="13" stroke="#24566A" strokeWidth="1" fill="#E6F0F4" opacity="0.8" />
+      <ellipse cx="30" cy="26" rx="6" ry="8" fill="#D6B15E" opacity="0.9" />
+      <circle cx="30" cy="26" r="2.8" fill="#24566A" />
+      <circle cx="29" cy="25" r="1" fill="#FFFDF9" />
+      {/* Delicate barbs */}
+      <path d="M23 34 C15 42 12 52 16 62" stroke="#E8B7BE" strokeWidth="0.9" opacity="0.7" />
+      <path d="M37 34 C45 42 48 52 44 62" stroke="#E8B7BE" strokeWidth="0.9" opacity="0.7" />
+      <path d="M25 48 C18 56 16 66 22 74" stroke="#D6B15E" strokeWidth="0.8" opacity="0.6" />
+      <path d="M35 48 C42 56 44 66 38 74" stroke="#D6B15E" strokeWidth="0.8" opacity="0.6" />
+    </svg>
+  );
+}
+
+/**
+ * Sacred Bansuri Flute Line-Art
  */
 export function GoldenFluteIcon({ className = 'w-8 h-4', ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 100 24" fill="none" className={className} aria-hidden="true" {...props}>
-      <defs>
-        <linearGradient id="fluteGoldGrad" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stopColor="#b45309" />
-          <stop offset="30%" stopColor="#fbbf24" />
-          <stop offset="70%" stopColor="#fef08a" />
-          <stop offset="100%" stopColor="#f59e0b" />
-        </linearGradient>
-      </defs>
-      <rect x="4" y="9" width="92" height="6.5" rx="3.25" fill="url(#fluteGoldGrad)" />
-      <circle cx="24" cy="12.2" r="1.5" fill="#061024" />
-      <circle cx="38" cy="12.2" r="1.5" fill="#061024" />
-      <circle cx="52" cy="12.2" r="1.5" fill="#061024" />
-      <circle cx="66" cy="12.2" r="1.5" fill="#061024" />
-      <circle cx="80" cy="12.2" r="1.5" fill="#061024" />
+      <rect x="6" y="9.5" width="88" height="5" rx="2.5" stroke="#D6B15E" strokeWidth="1.2" fill="#FAF5EB" />
+      <circle cx="24" cy="12" r="1.3" fill="#403A35" />
+      <circle cx="38" cy="12" r="1.3" fill="#403A35" />
+      <circle cx="52" cy="12" r="1.3" fill="#403A35" />
+      <circle cx="66" cy="12" r="1.3" fill="#403A35" />
+      <circle cx="80" cy="12" r="1.3" fill="#403A35" />
       {/* Thread binding tassels */}
-      <rect x="14" y="8" width="2" height="8.5" rx="0.5" fill="#ef4444" />
-      <rect x="88" y="8" width="2" height="8.5" rx="0.5" fill="#ef4444" />
+      <rect x="14" y="8" width="1.5" height="8" rx="0.5" fill="#E8B7BE" />
+      <rect x="86" y="8" width="1.5" height="8" rx="0.5" fill="#E8B7BE" />
     </svg>
   );
 }
@@ -122,50 +181,14 @@ export function GoldenFluteIcon({ className = 'w-8 h-4', ...props }: React.SVGPr
  * Sacred Lotus Emblem (SVG)
  */
 export function SacredLotusIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 48 48" fill="none" className={className} aria-hidden="true" {...props}>
-      <defs>
-        <linearGradient id="lotusPetal" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#f43f5e" />
-          <stop offset="100%" stopColor="#fbbf24" />
-        </linearGradient>
-      </defs>
-      {/* Central petal */}
-      <path d="M24,8 C21,18 20,28 24,38 C28,28 27,18 24,8 Z" fill="url(#lotusPetal)" />
-      {/* Left petal */}
-      <path d="M22,14 C15,22 13,30 20,38 C21,28 22,20 22,14 Z" fill="#fb7185" opacity="0.85" />
-      {/* Right petal */}
-      <path d="M26,14 C33,22 35,30 28,38 C27,28 26,20 26,14 Z" fill="#fb7185" opacity="0.85" />
-      {/* Outer wings */}
-      <path d="M16,22 C8,28 8,36 18,39 C17,31 16,26 16,22 Z" fill="#fda4af" opacity="0.7" />
-      <path d="M32,22 C40,28 40,36 30,39 C31,31 32,26 32,22 Z" fill="#fda4af" opacity="0.7" />
-      {/* Base node */}
-      <ellipse cx="24" cy="38" rx="8" ry="3" fill="#14b8a6" />
-    </svg>
-  );
+  return <LotusLineArt className={className} {...props} />;
 }
 
 /**
  * Sacred Diya / Lamp Icon (SVG)
  */
 export function DiyaIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg viewBox="0 0 40 40" fill="none" className={className} aria-hidden="true" {...props}>
-      <defs>
-        <radialGradient id="flameGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#fef08a" />
-          <stop offset="60%" stopColor="#f59e0b" />
-          <stop offset="100%" stopColor="transparent" />
-        </radialGradient>
-      </defs>
-      {/* Flame */}
-      <path d="M20,6 C16,14 16,18 20,24 C24,18 24,14 20,6 Z" fill="url(#flameGlow)" />
-      <circle cx="20" cy="18" r="2.5" fill="#fef08a" />
-      {/* Diya Clay Bowl */}
-      <path d="M8,24 C8,32 32,32 32,24 C28,26 12,26 8,24 Z" fill="#b45309" />
-      <path d="M12,32 L28,32 L26,35 L14,35 Z" fill="#78350f" />
-    </svg>
-  );
+  return <DiyaLineArt className={className} {...props} />;
 }
 
 /**
@@ -174,47 +197,23 @@ export function DiyaIcon({ className = 'w-6 h-6', ...props }: React.SVGProps<SVG
 export function AtmanSparkIcon({ className = 'w-8 h-8', ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 50 50" fill="none" className={className} aria-hidden="true" {...props}>
-      <circle cx="25" cy="25" r="7" fill="#fef08a" filter="drop-shadow(0 0 8px #fbbf24)" />
-      <circle cx="25" cy="25" r="3.5" fill="#ffffff" />
-      <path d="M25,2 L25,48 M2,25 L48,25 M9,9 L41,41 M9,41 L41,9" stroke="#fef08a" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+      <circle cx="25" cy="25" r="7" fill="#E8D18A" opacity="0.85" />
+      <circle cx="25" cy="25" r="3.5" fill="#FFFDF9" />
+      <path d="M25 2 L25 48 M2 25 L48 25 M9 9 L41 41 M9 41 L41 9" stroke="#D6B15E" strokeWidth="1.2" strokeLinecap="round" opacity="0.75" />
     </svg>
   );
 }
 
 /**
- * Sacred Temple Padlock Icon (SVG)
- * Elegant, antique lock matching the serif / Cinzel aesthetic
+ * Sacred Lock Icon (SVG) - Minimal, refined
  */
 export function SacredLockIcon({ className = 'w-4 h-4', ...props }: React.SVGProps<SVGSVGElement>) {
   return (
     <svg viewBox="0 0 24 24" fill="none" className={className} aria-hidden="true" {...props}>
-      {/* Ornate Arched Shackle */}
-      <path
-        d="M7 10V6.5C7 3.74 9.24 1.5 12 1.5C14.76 1.5 17 3.74 17 6.5V10"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
-      {/* Padlock Body with subtle beveled corners */}
-      <rect
-        x="4.5"
-        y="10"
-        width="15"
-        height="12"
-        rx="3"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        fill="currentColor"
-        fillOpacity="0.12"
-      />
-      {/* Antique Keyhole */}
+      <path d="M7 10V6.5C7 3.74 9.24 1.5 12 1.5C14.76 1.5 17 3.74 17 6.5V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="4.5" y="10" width="15" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.06" />
       <circle cx="12" cy="14.5" r="1.5" fill="currentColor" />
-      <path
-        d="M12 15.5V18"
-        stroke="currentColor"
-        strokeWidth="1.75"
-        strokeLinecap="round"
-      />
+      <path d="M12 15.5V18" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   );
 }

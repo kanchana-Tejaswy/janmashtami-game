@@ -4,7 +4,7 @@ import React from 'react';
 import { motion, HTMLMotionProps } from 'framer-motion';
 
 export interface CardProps extends HTMLMotionProps<'div'> {
-  variant?: 'interactive' | 'static' | 'climax';
+  variant?: 'interactive' | 'static' | 'climax' | 'blush';
   children: React.ReactNode;
 }
 
@@ -17,15 +17,17 @@ export function Card({
   const isInteractive = variant === 'interactive' || variant === 'climax';
 
   const baseStyles =
-    'relative rounded-2xl p-4 sm:p-5 border transition-all duration-300 backdrop-blur-sm select-none';
+    'relative rounded-2xl p-4 sm:p-5 border transition-all duration-300 select-none';
 
   const variantStyles = {
     static:
-      'bg-peacock-900/80 border-gold-500/25 shadow-glass-card text-ivory',
+      'bg-white/80 backdrop-blur-md border-gold-500/20 shadow-ujwala-card text-warm-800',
     interactive:
-      'bg-peacock-900/80 hover:bg-peacock-850 border-gold-500/25 hover:border-gold-400 shadow-glass-card hover:shadow-divine-sm cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400',
+      'bg-white/85 hover:bg-white backdrop-blur-md border-gold-500/25 hover:border-gold-400 shadow-ujwala-card hover:shadow-ujwala-card-hover cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400 text-warm-800',
     climax:
-      'bg-gradient-to-b from-peacock-850 to-peacock-950 border-gold-400/60 shadow-divine-md hover:shadow-divine-lg cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400',
+      'bg-gradient-to-b from-white via-ivory-soft to-lavender-soft/30 border-gold-400/60 shadow-ujwala-md hover:shadow-ujwala-lg cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-gold-400 text-warm-800',
+    blush:
+      'bg-gradient-to-b from-white via-blush-light to-white border-blush/40 shadow-blush-card text-warm-800',
   };
 
   return (
@@ -39,3 +41,4 @@ export function Card({
     </motion.div>
   );
 }
+

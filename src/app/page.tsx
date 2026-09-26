@@ -10,7 +10,7 @@ import { Level1Container } from '@/features/level1/level1-container';
 import { Level2Container } from '@/features/level2/level2-container';
 import { Level3Container } from '@/features/level3/level3-container';
 import { FinalContainer } from '@/features/final/final-container';
-import { PeacockFeatherIcon } from '@/components/ui/icons';
+import { LotusLineArt, DiyaLineArt } from '@/components/ui/icons';
 
 export default function QuestPage() {
   const {
@@ -25,8 +25,8 @@ export default function QuestPage() {
   } = useQuestState();
 
   return (
-    <div className="relative min-h-screen flex flex-col justify-between selection:bg-gold-500/25 selection:text-gold-200">
-      {/* Background Interactive Particle Layer */}
+    <div className="relative min-h-screen flex flex-col justify-between selection:bg-gold-500/20 selection:text-warm-900">
+      {/* Background Subtle Particle & Radiance Layer */}
       <ParticlesCanvas />
 
       {/* Progression Lock Notification Toast */}
@@ -37,7 +37,7 @@ export default function QuestPage() {
 
       {/* Main Quest Canvas & Progression */}
       <main className="flex-1 w-full max-w-5xl mx-auto px-4 z-10">
-        {/* River Yamuna Navigation Progress Track */}
+        {/* UJWALA 4-Stage Journey Navigation Track */}
         <RiverNav
           activeStation={activeStation}
           completedStations={completedStations}
@@ -74,16 +74,16 @@ export default function QuestPage() {
         </div>
       </main>
 
-      {/* Sacred Vrindavan Footer */}
-      <footer className="w-full py-8 mt-20 sm:mt-24 border-t border-peacock-800/60 text-center relative z-10 text-xs text-ivory-dim/70">
+      {/* UJWALA Festival Footer */}
+      <footer className="w-full py-10 mt-20 sm:mt-24 border-t border-warm-200/80 text-center relative z-10 text-xs text-warm-500">
         <div className="max-w-xl mx-auto px-4 flex flex-col items-center gap-2.5">
-          <div className="p-1.5 rounded-full bg-peacock-900 border border-teal-500/20 text-teal-400">
-            <PeacockFeatherIcon className="w-4 h-6" />
+          <div className="p-2 rounded-full bg-ivory border border-gold/30 text-gold-600 shadow-ujwala-sm">
+            <LotusLineArt className="w-5 h-5" />
           </div>
-          <p className="font-display tracking-[0.18em] text-gold-400/80 uppercase text-[11px]">
-            Janmashtami · Journey to the Soul
+          <p className="font-serif tracking-[0.2em] text-gold-700 uppercase text-[11px] font-medium">
+            UJWALA · A Journey from Within
           </p>
-          <p className="font-quote italic text-ivory-dim/40 text-xs sm:text-[13px] max-w-lg leading-relaxed">
+          <p className="font-serif italic text-warm-600 text-xs sm:text-[13px] max-w-lg leading-relaxed">
             &ldquo;In this world, there is nothing so sublime and pure as transcendental knowledge.&rdquo; — Bhagavad Gita 4.38
           </p>
         </div>

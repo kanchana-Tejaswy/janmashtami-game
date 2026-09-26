@@ -8,7 +8,7 @@ interface OceanCanvasProps {
   phase: CoasterPhase;
 }
 
-interface Star {
+interface StarOrRay {
   x: number;
   y: number;
   size: number;
@@ -36,14 +36,49 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     let boatCurrentY = 0;
     let boatAngle = 0;
 
-    // Generate static celestial stars
-    const stars: Star[] = Array.from({ length: 36 }, () => ({
+    // Light specks in dawn sky
+    const lightSpecks: StarOrRay[] = Array.from({ length: 24 }, () => ({
       x: Math.random(),
-      y: Math.random() * 0.52, // Keep in upper night sky
-      size: 0.8 + Math.random() * 1.4,
-      baseAlpha: 0.25 + Math.random() * 0.5,
-      twinkleSpeed: 1.5 + Math.random() * 3.0,
+      y: Math.random() * 0.5,
+      size: 0.8 + Math.random() * 1.5,
+      baseAlpha: 0.2 + Math.random() * 0.4,
+      twinkleSpeed: 1.2 + Math.random() * 2.5,
     }));
+
+    // Interactive water ripples
+    interface Ripple {
+      x: number;
+      y: number;
+      radius: number;
+      maxRadius: number;
+      alpha: number;
+    }
+    const ripples: Ripple[] = [];
+
+    const handlePointerMove = (e: MouseEvent | TouchEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = 'touches' in e ? e.touches[0]?.clientX : e.clientX;
+      const clientY = 'touches' in e ? e.touches[0]?.clientY : e.clientY;
+      if (clientX === undefined || clientY === undefined) return;
+      const x = clientX - rect.left;
+      const y = clientY - rect.top;
+
+      if (y > height * 0.55) {
+        if (Math.random() < 0.25 || 'touches' in e) {
+          ripples.push({
+            x,
+            y,
+            radius: 2,
+            maxRadius: 28 + Math.random() * 20,
+            alpha: 0.6,
+          });
+          if (ripples.length > 20) ripples.shift();
+        }
+      }
+    };
+
+    window.addEventListener('mousemove', handlePointerMove);
+    window.addEventListener('touchmove', handlePointerMove, { passive: true });
 
     const resize = () => {
       if (!canvas.parentElement) return;
@@ -54,58 +89,77 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       canvas.height = height * dpr;
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
     };
 
     resize();
     window.addEventListener('resize', resize);
 
-    // Dynamic wave & atmospheric parameters based on journey phase
-    const getWaveParams = (currentPhase: CoasterPhase) => {
+    // Environmental parameters based on journey phase
+    const getEnvParams = (currentPhase: CoasterPhase) => {
       switch (currentPhase) {
         case 'drop':
-          // Stormy tempest: High amplitude, choppy, dark slate/obsidian palette
+          // Turbulence / Storm: Soft stormy lavender & mist
           return {
-            amplitude: 24,
-            speed: 3.4,
-            roughness: 1.6,
-            colorBack: '#040d1a',
-            colorMid: '#081c30',
-            colorFront: '#0f2c4c',
-            foamColor: 'rgba(226, 232, 240, 0.5)',
-            skyTop: '#020610',
-            skyBottom: '#071526',
-            moonGlow: 'rgba(254, 240, 138, 0.15)',
+            amplitude: 20,
+            speed: 2.8,
+            colorBack: '#B8A9D1',
+            colorMid: '#9B8CB5',
+            colorFront: '#7D6D99',
+            foamColor: 'rgba(255, 255, 255, 0.75)',
+            skyTop: '#DDD6EA',
+            skyBottom: '#C8BEDB',
+            sunGlow: 'rgba(232, 209, 138, 0.25)',
+            sunColor: '#E8D18A',
+            sunSize: 22,
           };
         case 'peace':
         case 'divine':
-          // Glassy calm & divine illumination: gentle rhythmic bobbing, shimmering teal/emerald
+          // Supreme Illumination / Calm: Golden dawn sunlight & crystalline water
           return {
-            amplitude: 7,
-            speed: 1.1,
-            roughness: 0.6,
-            colorBack: '#061a2f',
-            colorMid: '#004d40',
-            colorFront: '#0d9488',
-            foamColor: 'rgba(254, 240, 138, 0.55)',
-            skyTop: '#040e1f',
-            skyBottom: '#0f2942',
-            moonGlow: 'rgba(251, 191, 36, 0.45)',
+            amplitude: 6,
+            speed: 1.0,
+            colorBack: '#E8D18A',
+            colorMid: '#DEC274',
+            colorFront: '#D6B15E',
+            foamColor: 'rgba(255, 255, 255, 0.9)',
+            skyTop: '#FFFDF9',
+            skyBottom: '#FAF0F2',
+            sunGlow: 'rgba(214, 177, 94, 0.45)',
+            sunColor: '#D6B15E',
+            sunSize: 28,
+          };
+        case 'pause':
+          // Contemplative Pause: Soft blush & lavender horizon
+          return {
+            amplitude: 10,
+            speed: 1.3,
+            colorBack: '#DDD6EA',
+            colorMid: '#E8B7BE',
+            colorFront: '#D495A0',
+            foamColor: 'rgba(255, 255, 255, 0.7)',
+            skyTop: '#FBF7EF',
+            skyBottom: '#EEEAF5',
+            sunGlow: 'rgba(232, 209, 138, 0.35)',
+            sunColor: '#E8D18A',
+            sunSize: 24,
           };
         case 'rise':
         default:
-          // Pleasant rhythmic waves: Peacock blue/teal
+          // Dawn Highs: Warm ivory sky, soft lavender-blush water
           return {
-            amplitude: 13,
-            speed: 1.9,
-            roughness: 1.0,
-            colorBack: '#06182e',
-            colorMid: '#0a2544',
-            colorFront: '#00695c',
-            foamColor: 'rgba(20, 184, 166, 0.4)',
-            skyTop: '#051124',
-            skyBottom: '#0b203a',
-            moonGlow: 'rgba(254, 240, 138, 0.3)',
+            amplitude: 12,
+            speed: 1.6,
+            colorBack: '#EADCE0',
+            colorMid: '#DEC274',
+            colorFront: '#D6B15E',
+            foamColor: 'rgba(255, 255, 255, 0.75)',
+            skyTop: '#FFFDF9',
+            skyBottom: '#F6EFE5',
+            sunGlow: 'rgba(232, 209, 138, 0.35)',
+            sunColor: '#E8D18A',
+            sunSize: 24,
           };
       }
     };
@@ -114,76 +168,80 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       time += 0.02;
       ctx.clearRect(0, 0, width, height);
 
-      const params = getWaveParams(phase);
+      const params = getEnvParams(phase);
       const baseY = height * 0.64;
 
-      /* ---------------- 1. Night Sky Backdrop ---------------- */
+      /* ---------------- 1. Dawn Sky Backdrop ---------------- */
       const skyGrad = ctx.createLinearGradient(0, 0, 0, baseY);
       skyGrad.addColorStop(0, params.skyTop);
-      skyGrad.addColorStop(1, params.skyBottom);
+      skyGrad.addColorStop(0.65, params.skyBottom);
+      skyGrad.addColorStop(1, '#F3D9DC');
       ctx.fillStyle = skyGrad;
       ctx.fillRect(0, 0, width, baseY + 14);
 
-      /* ---------------- 2. Twinkling Celestial Stars ---------------- */
+      /* ---------------- 2. Light Specks in Dawn Sky ---------------- */
       ctx.save();
-      for (let i = 0; i < stars.length; i++) {
-        const star = stars[i];
+      for (let i = 0; i < lightSpecks.length; i++) {
+        const speck = lightSpecks[i];
         const alpha = Math.max(
           0.1,
-          star.baseAlpha + Math.sin(time * star.twinkleSpeed + i) * 0.25
+          speck.baseAlpha + Math.sin(time * speck.twinkleSpeed + i) * 0.2
         );
-        ctx.fillStyle = `rgba(254, 240, 138, ${alpha})`;
+        ctx.fillStyle = `rgba(214, 177, 94, ${alpha})`;
         ctx.beginPath();
-        ctx.arc(star.x * width, star.y * baseY, star.size, 0, Math.PI * 2);
+        ctx.arc(speck.x * width, speck.y * baseY, speck.size, 0, Math.PI * 2);
         ctx.fill();
       }
       ctx.restore();
 
-      /* ---------------- 3. Radiant Crescent Moon & Ambient Bloom ---------------- */
+      /* ---------------- 3. Radiant Dawn Sun & Soft Halo ---------------- */
       ctx.save();
-      const moonX = width * 0.84;
-      const moonY = baseY * 0.3;
+      const sunX = width * 0.82;
+      const sunY = baseY * 0.32;
 
-      // Soft ambient golden moon bloom
-      const moonBloom = ctx.createRadialGradient(moonX, moonY, 4, moonX, moonY, 42);
-      moonBloom.addColorStop(0, params.moonGlow);
-      moonBloom.addColorStop(1, 'transparent');
-      ctx.fillStyle = moonBloom;
+      // Soft ambient diffused golden bloom
+      const sunBloom = ctx.createRadialGradient(sunX, sunY, 6, sunX, sunY, 54);
+      sunBloom.addColorStop(0, params.sunGlow);
+      sunBloom.addColorStop(0.5, 'rgba(243, 217, 220, 0.2)');
+      sunBloom.addColorStop(1, 'transparent');
+      ctx.fillStyle = sunBloom;
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 42, 0, Math.PI * 2);
+      ctx.arc(sunX, sunY, 54, 0, Math.PI * 2);
       ctx.fill();
 
-      // Crescent Moon Body
+      // Sun Core Orb
       ctx.beginPath();
-      ctx.arc(moonX, moonY, 17, 0, Math.PI * 2);
-      ctx.fillStyle = '#fef08a';
-      ctx.shadowColor = '#fbbf24';
-      ctx.shadowBlur = phase === 'divine' ? 22 : 12;
+      ctx.arc(sunX, sunY, params.sunSize * 0.55, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFDF9';
+      ctx.shadowColor = params.sunColor;
+      ctx.shadowBlur = 16;
       ctx.fill();
 
-      // Crescent Shadow cutout
+      // Delicate outer ring
       ctx.beginPath();
-      ctx.arc(moonX - 4.5, moonY - 2, 14.5, 0, Math.PI * 2);
-      ctx.fillStyle = params.skyBottom;
-      ctx.shadowBlur = 0;
-      ctx.fill();
+      ctx.arc(sunX, sunY, params.sunSize * 0.75, 0, Math.PI * 2);
+      ctx.strokeStyle = params.sunColor;
+      ctx.lineWidth = 1;
+      ctx.stroke();
       ctx.restore();
 
-      /* ---------------- 4. Wave Layer 1: Back Wave (Deep Drift) ---------------- */
+      /* ---------------- 4. Wave Layer 1: Back Wave ---------------- */
       ctx.beginPath();
-      ctx.moveTo(0, baseY - 14);
+      ctx.moveTo(0, baseY - 12);
       for (let x = 0; x <= width; x += 10) {
         const y =
           baseY -
-          14 +
-          Math.sin(x * 0.007 + time * params.speed * 0.75) * (params.amplitude * 0.55);
+          12 +
+          Math.sin(x * 0.007 + time * params.speed * 0.75) * (params.amplitude * 0.5);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
       ctx.lineTo(0, height);
       ctx.closePath();
       ctx.fillStyle = params.colorBack;
+      ctx.globalAlpha = 0.55;
       ctx.fill();
+      ctx.globalAlpha = 1.0;
 
       /* ---------------- 5. Wave Layer 2: Mid Wave (Main Ocean Swell) ---------------- */
       ctx.beginPath();
@@ -192,33 +250,33 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY +
           Math.sin(x * 0.011 - time * params.speed) * params.amplitude +
-          Math.cos(x * 0.018 + time * 1.4) * (params.amplitude * 0.3);
+          Math.cos(x * 0.018 + time * 1.3) * (params.amplitude * 0.25);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
       ctx.lineTo(0, height);
       ctx.closePath();
       ctx.fillStyle = params.colorMid;
+      ctx.globalAlpha = 0.75;
       ctx.fill();
+      ctx.globalAlpha = 1.0;
 
-      /* ---------------- 6. Boat Physics & Buoyancy Calculation ---------------- */
+      /* ---------------- 6. Boat Physics & Coordinates ---------------- */
       const targetX = width * 0.12 + width * 0.76 * progressRatio;
       boatCurrentX += (targetX - boatCurrentX) * 0.08;
 
-      // Exact wave height at boat's horizontal position
       const waveAtBoat =
         baseY +
         Math.sin(boatCurrentX * 0.011 - time * params.speed) * params.amplitude +
-        Math.cos(boatCurrentX * 0.018 + time * 1.4) * (params.amplitude * 0.3);
+        Math.cos(boatCurrentX * 0.018 + time * 1.3) * (params.amplitude * 0.25);
 
-      // Tangent / slope estimation for natural rocking tilt
       const waveAhead =
         baseY +
         Math.sin((boatCurrentX + 12) * 0.011 - time * params.speed) * params.amplitude +
-        Math.cos((boatCurrentX + 12) * 0.018 + time * 1.4) * (params.amplitude * 0.3);
+        Math.cos((boatCurrentX + 12) * 0.018 + time * 1.3) * (params.amplitude * 0.25);
 
       const waveSlope = (waveAhead - waveAtBoat) / 12;
-      const targetAngle = Math.atan(waveSlope) * (phase === 'drop' ? 1.25 : 0.85);
+      const targetAngle = Math.atan(waveSlope) * (phase === 'drop' ? 1.1 : 0.75);
 
       boatCurrentY += (waveAtBoat - boatCurrentY) * 0.16;
       boatAngle += (targetAngle - boatAngle) * 0.12;
@@ -231,111 +289,111 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         boatCurrentX,
         height
       );
-      reflectionGrad.addColorStop(0, 'rgba(251, 191, 36, 0.4)');
-      reflectionGrad.addColorStop(0.5, 'rgba(245, 158, 11, 0.15)');
+      reflectionGrad.addColorStop(0, 'rgba(232, 209, 138, 0.45)');
+      reflectionGrad.addColorStop(0.5, 'rgba(214, 177, 94, 0.2)');
       reflectionGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = reflectionGrad;
-      ctx.fillRect(boatCurrentX - 10, boatCurrentY + 4, 20, height - boatCurrentY);
+      ctx.fillRect(boatCurrentX - 8, boatCurrentY + 2, 16, height - boatCurrentY);
       ctx.restore();
 
-      /* ---------------- 8. Crafted Stylized Boat ---------------- */
+      /* ---------------- 8. Crafted Minimal Boat (UJWALA Style) ---------------- */
       ctx.save();
-      ctx.translate(boatCurrentX, boatCurrentY - 4);
+      ctx.translate(boatCurrentX, boatCurrentY - 3);
       ctx.rotate(boatAngle);
 
-      // Boat Hull Gradient (Mahogany to Teak)
-      const hullGrad = ctx.createLinearGradient(0, -6, 0, 16);
-      hullGrad.addColorStop(0, '#92400e');
-      hullGrad.addColorStop(1, '#451a03');
+      // Boat Hull Gradient (Warm Teak to Ivory Trim)
+      const hullGrad = ctx.createLinearGradient(0, -6, 0, 15);
+      hullGrad.addColorStop(0, '#A67C38');
+      hullGrad.addColorStop(1, '#6B4A1D');
 
-      // Gracefully curved Hull
+      // Gracefully curved Minimal Hull
       ctx.beginPath();
-      ctx.moveTo(-32, -4);
-      ctx.quadraticCurveTo(-38, 14, -18, 15);
-      ctx.lineTo(24, 15);
-      ctx.quadraticCurveTo(40, 14, 38, -4);
+      ctx.moveTo(-30, -3);
+      ctx.quadraticCurveTo(-36, 13, -16, 14);
+      ctx.lineTo(22, 14);
+      ctx.quadraticCurveTo(38, 13, 36, -3);
       ctx.closePath();
       ctx.fillStyle = hullGrad;
       ctx.fill();
 
       // Fine golden gunwale rim
       ctx.lineWidth = 1.5;
-      ctx.strokeStyle = '#fbbf24';
+      ctx.strokeStyle = '#D6B15E';
       ctx.stroke();
 
       // Deck Trim Line
       ctx.beginPath();
-      ctx.moveTo(-28, -2);
-      ctx.lineTo(34, -2);
-      ctx.strokeStyle = '#fef08a';
+      ctx.moveTo(-26, -1.5);
+      ctx.lineTo(32, -1.5);
+      ctx.strokeStyle = '#FAF3DC';
       ctx.lineWidth = 1;
       ctx.stroke();
 
       // Slender Wooden Mast
       ctx.beginPath();
-      ctx.moveTo(0, -2);
-      ctx.lineTo(0, -32);
-      ctx.strokeStyle = '#d97706';
-      ctx.lineWidth = 2.2;
+      ctx.moveTo(0, -1.5);
+      ctx.lineTo(0, -30);
+      ctx.strokeStyle = '#99752A';
+      ctx.lineWidth = 2.0;
       ctx.stroke();
 
-      // Fluttering Silk Sail / Pennant
-      const pennantFlutter = Math.sin(time * 3.5) * 3;
+      // Fluttering Silk Sail / Pennant (Soft Blush / Gold)
+      const pennantFlutter = Math.sin(time * 3.2) * 2.5;
       ctx.beginPath();
-      ctx.moveTo(0, -32);
-      ctx.quadraticCurveTo(18 + pennantFlutter, -22, 2, -8);
+      ctx.moveTo(0, -30);
+      ctx.quadraticCurveTo(16 + pennantFlutter, -20, 2, -7);
       ctx.closePath();
-      ctx.fillStyle = phase === 'divine' ? '#fbbf24' : '#14b8a6';
-      ctx.shadowColor = phase === 'divine' ? '#f59e0b' : '#0d9488';
-      ctx.shadowBlur = 8;
+      ctx.fillStyle = phase === 'divine' || phase === 'peace' ? '#D6B15E' : '#E8B7BE';
+      ctx.shadowColor = 'rgba(214, 177, 94, 0.4)';
+      ctx.shadowBlur = 6;
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Diya (Sacred Oil Lamp) at the Prow
-      const diyaX = 32;
-      const diyaY = -4;
+      // Diya at the Prow (Sacred Inner Light)
+      const diyaX = 30;
+      const diyaY = -3;
 
-      // Clay bowl
+      // Diya Bowl
       ctx.beginPath();
-      ctx.ellipse(diyaX, diyaY, 4.5, 2.5, 0, 0, Math.PI * 2);
-      ctx.fillStyle = '#b45309';
+      ctx.ellipse(diyaX, diyaY, 4, 2.2, 0, 0, Math.PI * 2);
+      ctx.fillStyle = '#C49B45';
       ctx.fill();
 
-      // Flickering Diya Flame & Point-Light Bloom
-      const flameFlicker = 1 + Math.sin(time * 8.5) * 0.15;
+      // Flickering Diya Flame & Bloom
+      const flameFlicker = 1 + Math.sin(time * 8.0) * 0.15;
       const diyaBloom = ctx.createRadialGradient(
         diyaX,
         diyaY - 4,
         1,
         diyaX,
         diyaY - 4,
-        18 * flameFlicker
+        16 * flameFlicker
       );
-      diyaBloom.addColorStop(0, 'rgba(254, 240, 138, 0.9)');
-      diyaBloom.addColorStop(0.35, 'rgba(251, 191, 36, 0.45)');
+      diyaBloom.addColorStop(0, 'rgba(255, 253, 249, 0.95)');
+      diyaBloom.addColorStop(0.4, 'rgba(232, 209, 138, 0.6)');
       diyaBloom.addColorStop(1, 'transparent');
 
       ctx.fillStyle = diyaBloom;
       ctx.beginPath();
-      ctx.arc(diyaX, diyaY - 4, 18 * flameFlicker, 0, Math.PI * 2);
+      ctx.arc(diyaX, diyaY - 4, 16 * flameFlicker, 0, Math.PI * 2);
       ctx.fill();
 
       // Flame core
       ctx.beginPath();
-      ctx.arc(diyaX, diyaY - 4, 2.5, 0, Math.PI * 2);
-      ctx.fillStyle = '#ffffff';
+      ctx.arc(diyaX, diyaY - 4, 2, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
       ctx.fill();
 
       ctx.restore();
 
-      /* ---------------- 9. Wave Layer 3: Foreground Wave & Crest Foam ---------------- */
+      /* ---------------- 9. Wave Layer 3: Foreground Wave & Foam ---------------- */
       ctx.beginPath();
-      ctx.moveTo(0, baseY + 10);
+      ctx.moveTo(0, baseY + 8);
       for (let x = 0; x <= width; x += 6) {
         const y =
           baseY +
-          10 +
-          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.8);
+          8 +
+          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -346,25 +404,43 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
 
       // Foam Crest line
       ctx.beginPath();
-      ctx.moveTo(0, baseY + 10);
+      ctx.moveTo(0, baseY + 8);
       for (let x = 0; x <= width; x += 6) {
         const y =
           baseY +
-          10 +
-          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.8);
+          8 +
+          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.strokeStyle = params.foamColor;
-      ctx.lineWidth = 1.4;
+      ctx.lineWidth = 1.25;
       ctx.stroke();
 
-      /* ---------------- 10. Golden Divine Reflection Rays on Calm Phase ---------------- */
+      /* ---------------- 10. Golden Sunlight Reflection Rays on Calm/Peace ---------------- */
       if (phase === 'divine' || phase === 'peace') {
-        const divineGrad = ctx.createLinearGradient(moonX, moonY, boatCurrentX, height);
-        divineGrad.addColorStop(0, 'rgba(254, 240, 138, 0.18)');
+        const divineGrad = ctx.createLinearGradient(sunX, sunY, boatCurrentX, height);
+        divineGrad.addColorStop(0, 'rgba(232, 209, 138, 0.22)');
         divineGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = divineGrad;
-        ctx.fillRect(0, baseY - 20, width, height - baseY + 20);
+        ctx.fillRect(0, baseY - 18, width, height - baseY + 18);
+      }
+
+      /* ---------------- 11. Interactive Water Ripples ---------------- */
+      for (let i = ripples.length - 1; i >= 0; i--) {
+        const r = ripples[i];
+        r.radius += 0.7;
+        r.alpha *= 0.94;
+        if (r.alpha < 0.02 || r.radius > r.maxRadius) {
+          ripples.splice(i, 1);
+          continue;
+        }
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(232, 209, 138, ${r.alpha})`;
+        ctx.lineWidth = 1.2;
+        ctx.stroke();
+        ctx.restore();
       }
 
       animId = requestAnimationFrame(render);
@@ -375,15 +451,18 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('touchmove', handlePointerMove);
     };
   }, [phase, progressRatio]);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-64 sm:h-72 rounded-3xl overflow-hidden backdrop-blur-md border border-white/[0.08] shadow-[0_15px_35px_-10px_rgba(6,16,36,0.8),inset_0_1px_1px_rgba(255,255,255,0.08)]"
+      className="relative w-full h-64 sm:h-72 rounded-3xl overflow-hidden backdrop-blur-md border border-gold-400/30 shadow-ujwala-card"
     >
       <canvas ref={canvasRef} className="w-full h-full block" />
     </div>
   );
 }
+

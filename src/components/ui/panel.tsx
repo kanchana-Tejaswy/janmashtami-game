@@ -15,11 +15,11 @@ export function Panel({
 }: PanelProps) {
   const variantStyles = {
     default:
-      'rounded-3xl bg-peacock-900/85 border border-gold-500/25 shadow-glass-panel',
+      'rounded-3xl bg-white/80 backdrop-blur-md border border-gold-500/25 shadow-ujwala-md',
     niche:
-      'rounded-niche bg-gradient-to-b from-peacock-900/90 via-peacock-950 to-peacock-900 border-2 border-gold-400/50 shadow-divine-md',
+      'rounded-niche bg-gradient-to-b from-white via-ivory-soft to-white border-2 border-gold-400/50 shadow-ujwala-lg',
     divine:
-      'rounded-3xl bg-gradient-to-b from-peacock-900/95 via-peacock-950 to-peacock-900 border-2 border-gold-400 shadow-[0_0_40px_rgba(245,158,11,0.3)]',
+      'rounded-3xl bg-gradient-to-b from-white via-ivory-soft to-lavender-soft/40 border-2 border-gold-400/60 shadow-ujwala-halo',
   };
 
   return (
@@ -29,10 +29,11 @@ export function Panel({
     >
       {/* Background subtle radial glow */}
       <div
-        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(20,184,166,0.1)_0%,transparent_60%)] pointer-events-none"
+        className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(232,209,138,0.18)_0%,transparent_60%)] pointer-events-none"
         aria-hidden="true"
       />
       <div className="relative z-10">{children}</div>
     </div>
   );
 }
+

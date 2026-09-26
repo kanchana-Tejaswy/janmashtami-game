@@ -3,21 +3,22 @@
 import React from 'react';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: 'gold' | 'teal' | 'saffron' | 'subtle';
+  variant?: 'gold' | 'blush' | 'lavender' | 'peacock' | 'subtle';
   children: React.ReactNode;
 }
 
 export function Badge({
-  variant = 'teal',
+  variant = 'gold',
   children,
   className = '',
   ...props
 }: BadgeProps) {
   const variantStyles = {
-    gold: 'bg-gold-500/15 border-gold-400/40 text-gold-300',
-    teal: 'bg-teal-500/15 border-teal-400/40 text-teal-300',
-    saffron: 'bg-saffron-500/15 border-saffron-400/40 text-saffron-300',
-    subtle: 'bg-peacock-800/80 border-peacock-700 text-ivory-dim',
+    gold: 'bg-gold-50 border-gold-300 text-gold-700 shadow-sm',
+    blush: 'bg-blush-light border-blush text-warm-800 shadow-sm',
+    lavender: 'bg-lavender-light border-lavender text-warm-800 shadow-sm',
+    peacock: 'bg-peacock-light border-peacock/30 text-peacock font-medium',
+    subtle: 'bg-white/80 border-warm-200 text-warm-600',
   };
 
   return (
@@ -29,3 +30,4 @@ export function Badge({
     </span>
   );
 }
+
