@@ -16,9 +16,23 @@ interface StarOrRay {
   twinkleSpeed: number;
 }
 
+interface Ripple {
+  x: number;
+  y: number;
+  radius: number;
+  maxRadius: number;
+  alpha: number;
+}
+
 export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  // Store current props in a ref so the continuous animation loop reads the latest values without re-mounting
+  const propsRef = useRef({ progressRatio, phase });
+  useEffect(() => {
+    propsRef.current = { progressRatio, phase };
+  }, [progressRatio, phase]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -31,10 +45,18 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     let height = 0;
     let time = 0;
 
-    // Smooth boat target coordinates & tilt
-    let boatCurrentX = 0;
-    let boatCurrentY = 0;
+    // Persistent boat coordinates across step changes
+    let boatCurrentX = -1; // -1 indicates uninitialized
+    let boatCurrentY = -1;
     let boatAngle = 0;
+
+    // Smoothed environmental parameters for cinematic transitions between phases
+    const currentEnv = {
+      amplitude: 12,
+      targetAmplitude: 12,
+      speed: 1.6,
+      targetSpeed: 1.6,
+    };
 
     // Light specks in dawn sky
     const lightSpecks: StarOrRay[] = Array.from({ length: 24 }, () => ({
@@ -46,13 +68,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     }));
 
     // Interactive water ripples
-    interface Ripple {
-      x: number;
-      y: number;
-      radius: number;
-      maxRadius: number;
-      alpha: number;
-    }
     const ripples: Ripple[] = [];
 
     const handlePointerMove = (e: MouseEvent | TouchEvent) => {
@@ -91,6 +106,12 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       canvas.style.height = `${height}px`;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
+
+      // On resize, if boat is already initialized, keep its relative position
+      if (boatCurrentX > 0) {
+        const targetX = width * 0.12 + width * 0.76 * propsRef.current.progressRatio;
+        boatCurrentX = targetX;
+      }
     };
 
     resize();
@@ -100,7 +121,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     const getEnvParams = (currentPhase: CoasterPhase) => {
       switch (currentPhase) {
         case 'drop':
-          // Turbulence / Storm: Soft stormy lavender & mist
           return {
             amplitude: 20,
             speed: 2.8,
@@ -116,7 +136,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
           };
         case 'peace':
         case 'divine':
-          // Supreme Illumination / Calm: Golden dawn sunlight & crystalline water
           return {
             amplitude: 6,
             speed: 1.0,
@@ -131,7 +150,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
             sunSize: 28,
           };
         case 'pause':
-          // Contemplative Pause: Soft blush & lavender horizon
           return {
             amplitude: 10,
             speed: 1.3,
@@ -147,7 +165,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
           };
         case 'rise':
         default:
-          // Dawn Highs: Warm ivory sky, soft lavender-blush water
           return {
             amplitude: 12,
             speed: 1.6,
@@ -165,10 +182,18 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     };
 
     const render = () => {
-      time += 0.02;
+      const { progressRatio: targetProgressRatio, phase: currentPhase } = propsRef.current;
+      const params = getEnvParams(currentPhase);
+
+      // Smoothly interpolate environmental wave dynamics
+      currentEnv.targetAmplitude = params.amplitude;
+      currentEnv.targetSpeed = params.speed;
+      currentEnv.amplitude += (currentEnv.targetAmplitude - currentEnv.amplitude) * 0.05;
+      currentEnv.speed += (currentEnv.targetSpeed - currentEnv.speed) * 0.05;
+
+      time += 0.012 * currentEnv.speed;
       ctx.clearRect(0, 0, width, height);
 
-      const params = getEnvParams(phase);
       const baseY = height * 0.64;
 
       /* ---------------- 1. Dawn Sky Backdrop ---------------- */
@@ -232,7 +257,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY -
           12 +
-          Math.sin(x * 0.007 + time * params.speed * 0.75) * (params.amplitude * 0.5);
+          Math.sin(x * 0.007 + time * 1.5) * (currentEnv.amplitude * 0.5);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -249,8 +274,8 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       for (let x = 0; x <= width; x += 8) {
         const y =
           baseY +
-          Math.sin(x * 0.011 - time * params.speed) * params.amplitude +
-          Math.cos(x * 0.018 + time * 1.3) * (params.amplitude * 0.25);
+          Math.sin(x * 0.011 - time * 2.0) * currentEnv.amplitude +
+          Math.cos(x * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -261,25 +286,38 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.fill();
       ctx.globalAlpha = 1.0;
 
-      /* ---------------- 6. Boat Physics & Coordinates ---------------- */
-      const targetX = width * 0.12 + width * 0.76 * progressRatio;
-      boatCurrentX += (targetX - boatCurrentX) * 0.08;
+      /* ---------------- 6. Boat Physics & Smooth Progressive Sailing ---------------- */
+      const targetX = width * 0.12 + width * 0.76 * targetProgressRatio;
+
+      if (boatCurrentX < 0) {
+        // Initial frame: start precisely at target location without jumping from zero
+        boatCurrentX = targetX;
+      } else {
+        // Smoothly ease forward across the ocean from current position to new milestone
+        const dx = targetX - boatCurrentX;
+        boatCurrentX += dx * 0.045;
+      }
 
       const waveAtBoat =
         baseY +
-        Math.sin(boatCurrentX * 0.011 - time * params.speed) * params.amplitude +
-        Math.cos(boatCurrentX * 0.018 + time * 1.3) * (params.amplitude * 0.25);
+        Math.sin(boatCurrentX * 0.011 - time * 2.0) * currentEnv.amplitude +
+        Math.cos(boatCurrentX * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
 
       const waveAhead =
         baseY +
-        Math.sin((boatCurrentX + 12) * 0.011 - time * params.speed) * params.amplitude +
-        Math.cos((boatCurrentX + 12) * 0.018 + time * 1.3) * (params.amplitude * 0.25);
+        Math.sin((boatCurrentX + 12) * 0.011 - time * 2.0) * currentEnv.amplitude +
+        Math.cos((boatCurrentX + 12) * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
 
       const waveSlope = (waveAhead - waveAtBoat) / 12;
-      const targetAngle = Math.atan(waveSlope) * (phase === 'drop' ? 1.1 : 0.75);
+      const targetAngle = Math.atan(waveSlope) * (currentPhase === 'drop' ? 1.1 : 0.75);
 
-      boatCurrentY += (waveAtBoat - boatCurrentY) * 0.16;
-      boatAngle += (targetAngle - boatAngle) * 0.12;
+      if (boatCurrentY < 0) {
+        boatCurrentY = waveAtBoat;
+        boatAngle = targetAngle;
+      } else {
+        boatCurrentY += (waveAtBoat - boatCurrentY) * 0.16;
+        boatAngle += (targetAngle - boatAngle) * 0.12;
+      }
 
       /* ---------------- 7. Downwelling Diya Reflection Trail ---------------- */
       ctx.save();
@@ -338,12 +376,12 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.stroke();
 
       // Fluttering Silk Sail / Pennant (Soft Blush / Gold)
-      const pennantFlutter = Math.sin(time * 3.2) * 2.5;
+      const pennantFlutter = Math.sin(time * 4.0) * 2.5;
       ctx.beginPath();
       ctx.moveTo(0, -30);
       ctx.quadraticCurveTo(16 + pennantFlutter, -20, 2, -7);
       ctx.closePath();
-      ctx.fillStyle = phase === 'divine' || phase === 'peace' ? '#D6B15E' : '#E8B7BE';
+      ctx.fillStyle = currentPhase === 'divine' || currentPhase === 'peace' ? '#D6B15E' : '#E8B7BE';
       ctx.shadowColor = 'rgba(214, 177, 94, 0.4)';
       ctx.shadowBlur = 6;
       ctx.fill();
@@ -393,7 +431,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY +
           8 +
-          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.75);
+          Math.sin(x * 0.014 + time * 2.2) * (currentEnv.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -409,7 +447,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY +
           8 +
-          Math.sin(x * 0.014 + time * params.speed * 1.15) * (params.amplitude * 0.75);
+          Math.sin(x * 0.014 + time * 2.2) * (currentEnv.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.strokeStyle = params.foamColor;
@@ -417,7 +455,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.stroke();
 
       /* ---------------- 10. Golden Sunlight Reflection Rays on Calm/Peace ---------------- */
-      if (phase === 'divine' || phase === 'peace') {
+      if (currentPhase === 'divine' || currentPhase === 'peace') {
         const divineGrad = ctx.createLinearGradient(sunX, sunY, boatCurrentX, height);
         divineGrad.addColorStop(0, 'rgba(232, 209, 138, 0.22)');
         divineGrad.addColorStop(1, 'transparent');
@@ -454,7 +492,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('touchmove', handlePointerMove);
     };
-  }, [phase, progressRatio]);
+  }, []); // Run once on mount; reads latest props via propsRef without resetting boat coordinates!
 
   return (
     <div
@@ -465,4 +503,3 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     </div>
   );
 }
-
