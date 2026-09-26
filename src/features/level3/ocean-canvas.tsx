@@ -1,11 +1,13 @@
 'use client';
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useCallback } from 'react';
 import { CoasterPhase } from '@/types';
 
 interface OceanCanvasProps {
+  currentPointIndex: number;
   progressRatio: number; // 0 to 1
   phase: CoasterPhase;
+  onMovementComplete?: () => void;
 }
 
 interface StarOrRay {
@@ -24,15 +26,80 @@ interface Ripple {
   alpha: number;
 }
 
-export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
+export function OceanCanvas({
+  currentPointIndex,
+  progressRatio,
+  phase,
+  onMovementComplete,
+}: OceanCanvasProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // Store current props in a ref so the continuous animation loop reads the latest values without re-mounting
-  const propsRef = useRef({ progressRatio, phase });
+  // Single Source of Truth for Boat Journey Position & Smooth Interpolation
+  const boatStateRef = useRef<{
+    currentRatio: number;
+    startRatio: number;
+    targetRatio: number;
+    animStartTime: number;
+    animDuration: number;
+    isAnimating: boolean;
+    currentX: number;
+    currentY: number;
+    boatAngle: number;
+    time: number;
+    hasInitialized: boolean;
+  }>({
+    currentRatio: progressRatio,
+    startRatio: progressRatio,
+    targetRatio: progressRatio,
+    animStartTime: 0,
+    animDuration: 650,
+    isAnimating: false,
+    currentX: -1,
+    currentY: -1,
+    boatAngle: 0,
+    time: 0,
+    hasInitialized: false,
+  });
+
+  const onMovementCompleteRef = useRef(onMovementComplete);
   useEffect(() => {
-    propsRef.current = { progressRatio, phase };
-  }, [progressRatio, phase]);
+    onMovementCompleteRef.current = onMovementComplete;
+  }, [onMovementComplete]);
+
+  const phaseRef = useRef(phase);
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
+
+  // Handle Point Transitions: ALWAYS animate from CURRENT position to TARGET position
+  useEffect(() => {
+    const state = boatStateRef.current;
+
+    if (!state.hasInitialized) {
+      // First mount: Initialize directly at Point 0 position without jumping from 0px
+      state.currentRatio = progressRatio;
+      state.startRatio = progressRatio;
+      state.targetRatio = progressRatio;
+      state.hasInitialized = true;
+      state.isAnimating = false;
+      return;
+    }
+
+    if (state.targetRatio === progressRatio && !state.isAnimating) {
+      return;
+    }
+
+    // Previous point is precisely where the boat currently is
+    state.startRatio = state.currentRatio;
+    state.targetRatio = progressRatio;
+    state.animStartTime = performance.now();
+    state.isAnimating = true;
+
+    // Dynamic duration based on movement distance (~500ms - 800ms)
+    const distance = Math.abs(state.targetRatio - state.startRatio);
+    state.animDuration = Math.max(500, Math.min(800, distance * 2200));
+  }, [progressRatio, currentPointIndex]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -43,12 +110,6 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     let animId: number;
     let width = 0;
     let height = 0;
-    let time = 0;
-
-    // Persistent boat coordinates across step changes
-    let boatCurrentX = -1; // -1 indicates uninitialized
-    let boatCurrentY = -1;
-    let boatAngle = 0;
 
     // Smoothed environmental parameters for cinematic transitions between phases
     const currentEnv = {
@@ -107,11 +168,9 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.scale(dpr, dpr);
 
-      // On resize, if boat is already initialized, keep its relative position
-      if (boatCurrentX > 0) {
-        const targetX = width * 0.12 + width * 0.76 * propsRef.current.progressRatio;
-        boatCurrentX = targetX;
-      }
+      // Keep boat's pixel position locked to current ratio on resize
+      const state = boatStateRef.current;
+      state.currentX = width * 0.12 + width * 0.76 * state.currentRatio;
     };
 
     resize();
@@ -182,7 +241,8 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
     };
 
     const render = () => {
-      const { progressRatio: targetProgressRatio, phase: currentPhase } = propsRef.current;
+      const state = boatStateRef.current;
+      const currentPhase = phaseRef.current;
       const params = getEnvParams(currentPhase);
 
       // Smoothly interpolate environmental wave dynamics
@@ -191,7 +251,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       currentEnv.amplitude += (currentEnv.targetAmplitude - currentEnv.amplitude) * 0.05;
       currentEnv.speed += (currentEnv.targetSpeed - currentEnv.speed) * 0.05;
 
-      time += 0.012 * currentEnv.speed;
+      state.time += 0.012 * currentEnv.speed;
       ctx.clearRect(0, 0, width, height);
 
       const baseY = height * 0.64;
@@ -210,7 +270,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const speck = lightSpecks[i];
         const alpha = Math.max(
           0.1,
-          speck.baseAlpha + Math.sin(time * speck.twinkleSpeed + i) * 0.2
+          speck.baseAlpha + Math.sin(state.time * speck.twinkleSpeed + i) * 0.2
         );
         ctx.fillStyle = `rgba(214, 177, 94, ${alpha})`;
         ctx.beginPath();
@@ -257,7 +317,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY -
           12 +
-          Math.sin(x * 0.007 + time * 1.5) * (currentEnv.amplitude * 0.5);
+          Math.sin(x * 0.007 + state.time * 1.5) * (currentEnv.amplitude * 0.5);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -274,8 +334,8 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       for (let x = 0; x <= width; x += 8) {
         const y =
           baseY +
-          Math.sin(x * 0.011 - time * 2.0) * currentEnv.amplitude +
-          Math.cos(x * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
+          Math.sin(x * 0.011 - state.time * 2.0) * currentEnv.amplitude +
+          Math.cos(x * 0.018 + state.time * 1.3) * (currentEnv.amplitude * 0.25);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -286,58 +346,66 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.fill();
       ctx.globalAlpha = 1.0;
 
-      /* ---------------- 6. Boat Physics & Smooth Progressive Sailing ---------------- */
-      const targetX = width * 0.12 + width * 0.76 * targetProgressRatio;
+      /* ---------------- 6. Sequential Boat Physics & Continuous Movement ---------------- */
+      if (state.isAnimating) {
+        const elapsed = performance.now() - state.animStartTime;
+        const progress = Math.min(1, elapsed / state.animDuration);
+        // Smooth cubic ease out: 1 - (1 - t)^3
+        const eased = 1 - Math.pow(1 - progress, 3);
+        state.currentRatio = state.startRatio + (state.targetRatio - state.startRatio) * eased;
 
-      if (boatCurrentX < 0) {
-        // Initial frame: start precisely at target location without jumping from zero
-        boatCurrentX = targetX;
-      } else {
-        // Smoothly ease forward across the ocean from current position to new milestone
-        const dx = targetX - boatCurrentX;
-        boatCurrentX += dx * 0.045;
+        if (progress >= 1) {
+          state.currentRatio = state.targetRatio;
+          state.isAnimating = false;
+          if (onMovementCompleteRef.current) {
+            onMovementCompleteRef.current();
+          }
+        }
       }
+
+      // Compute Boat Pixel Position
+      state.currentX = width * 0.12 + width * 0.76 * state.currentRatio;
 
       const waveAtBoat =
         baseY +
-        Math.sin(boatCurrentX * 0.011 - time * 2.0) * currentEnv.amplitude +
-        Math.cos(boatCurrentX * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
+        Math.sin(state.currentX * 0.011 - state.time * 2.0) * currentEnv.amplitude +
+        Math.cos(state.currentX * 0.018 + state.time * 1.3) * (currentEnv.amplitude * 0.25);
 
       const waveAhead =
         baseY +
-        Math.sin((boatCurrentX + 12) * 0.011 - time * 2.0) * currentEnv.amplitude +
-        Math.cos((boatCurrentX + 12) * 0.018 + time * 1.3) * (currentEnv.amplitude * 0.25);
+        Math.sin((state.currentX + 12) * 0.011 - state.time * 2.0) * currentEnv.amplitude +
+        Math.cos((state.currentX + 12) * 0.018 + state.time * 1.3) * (currentEnv.amplitude * 0.25);
 
       const waveSlope = (waveAhead - waveAtBoat) / 12;
       const targetAngle = Math.atan(waveSlope) * (currentPhase === 'drop' ? 1.1 : 0.75);
 
-      if (boatCurrentY < 0) {
-        boatCurrentY = waveAtBoat;
-        boatAngle = targetAngle;
+      if (state.currentY < 0) {
+        state.currentY = waveAtBoat;
+        state.boatAngle = targetAngle;
       } else {
-        boatCurrentY += (waveAtBoat - boatCurrentY) * 0.16;
-        boatAngle += (targetAngle - boatAngle) * 0.12;
+        state.currentY += (waveAtBoat - state.currentY) * 0.16;
+        state.boatAngle += (targetAngle - state.boatAngle) * 0.12;
       }
 
       /* ---------------- 7. Downwelling Diya Reflection Trail ---------------- */
       ctx.save();
       const reflectionGrad = ctx.createLinearGradient(
-        boatCurrentX,
-        boatCurrentY,
-        boatCurrentX,
+        state.currentX,
+        state.currentY,
+        state.currentX,
         height
       );
       reflectionGrad.addColorStop(0, 'rgba(232, 209, 138, 0.45)');
       reflectionGrad.addColorStop(0.5, 'rgba(214, 177, 94, 0.2)');
       reflectionGrad.addColorStop(1, 'transparent');
       ctx.fillStyle = reflectionGrad;
-      ctx.fillRect(boatCurrentX - 8, boatCurrentY + 2, 16, height - boatCurrentY);
+      ctx.fillRect(state.currentX - 8, state.currentY + 2, 16, height - state.currentY);
       ctx.restore();
 
       /* ---------------- 8. Crafted Minimal Boat (UJWALA Style) ---------------- */
       ctx.save();
-      ctx.translate(boatCurrentX, boatCurrentY - 3);
-      ctx.rotate(boatAngle);
+      ctx.translate(state.currentX, state.currentY - 3);
+      ctx.rotate(state.boatAngle);
 
       // Boat Hull Gradient (Warm Teak to Ivory Trim)
       const hullGrad = ctx.createLinearGradient(0, -6, 0, 15);
@@ -376,7 +444,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.stroke();
 
       // Fluttering Silk Sail / Pennant (Soft Blush / Gold)
-      const pennantFlutter = Math.sin(time * 4.0) * 2.5;
+      const pennantFlutter = Math.sin(state.time * 4.0) * 2.5;
       ctx.beginPath();
       ctx.moveTo(0, -30);
       ctx.quadraticCurveTo(16 + pennantFlutter, -20, 2, -7);
@@ -398,7 +466,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       ctx.fill();
 
       // Flickering Diya Flame & Bloom
-      const flameFlicker = 1 + Math.sin(time * 8.0) * 0.15;
+      const flameFlicker = 1 + Math.sin(state.time * 8.0) * 0.15;
       const diyaBloom = ctx.createRadialGradient(
         diyaX,
         diyaY - 4,
@@ -431,7 +499,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY +
           8 +
-          Math.sin(x * 0.014 + time * 2.2) * (currentEnv.amplitude * 0.75);
+          Math.sin(x * 0.014 + state.time * 2.2) * (currentEnv.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.lineTo(width, height);
@@ -447,7 +515,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
         const y =
           baseY +
           8 +
-          Math.sin(x * 0.014 + time * 2.2) * (currentEnv.amplitude * 0.75);
+          Math.sin(x * 0.014 + state.time * 2.2) * (currentEnv.amplitude * 0.75);
         ctx.lineTo(x, y);
       }
       ctx.strokeStyle = params.foamColor;
@@ -456,7 +524,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
 
       /* ---------------- 10. Golden Sunlight Reflection Rays on Calm/Peace ---------------- */
       if (currentPhase === 'divine' || currentPhase === 'peace') {
-        const divineGrad = ctx.createLinearGradient(sunX, sunY, boatCurrentX, height);
+        const divineGrad = ctx.createLinearGradient(sunX, sunY, state.currentX, height);
         divineGrad.addColorStop(0, 'rgba(232, 209, 138, 0.22)');
         divineGrad.addColorStop(1, 'transparent');
         ctx.fillStyle = divineGrad;
@@ -492,7 +560,7 @@ export function OceanCanvas({ progressRatio, phase }: OceanCanvasProps) {
       window.removeEventListener('mousemove', handlePointerMove);
       window.removeEventListener('touchmove', handlePointerMove);
     };
-  }, []); // Run once on mount; reads latest props via propsRef without resetting boat coordinates!
+  }, []); // Run once on mount; continuous animation loop
 
   return (
     <div

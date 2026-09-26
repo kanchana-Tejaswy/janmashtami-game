@@ -19,6 +19,7 @@ import {
 import { UjwalaGlow, LightHalo } from '@/components/ui/light-system';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
+import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';
 
 interface FinalContainerProps {
   onComplete: () => void;
@@ -37,6 +38,11 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const cardPreviewRef = useRef<HTMLDivElement | null>(null);
+  const inquirySectionRef = useRef<HTMLDivElement | null>(null);
+  const revelationSectionRef = useRef<HTMLDivElement | null>(null);
+  const cardSuiteSectionRef = useRef<HTMLDivElement | null>(null);
+
+  const { scrollIfOffscreen } = useRevealAutoScroll();
 
   // 3D holographic tilt states
   const [tilt, setTilt] = useState<{ rx: number; ry: number; glareX: number; glareY: number }>({
@@ -60,6 +66,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
   const handleOpenMirror = () => {
     setStage('deep_inquiry');
     setInquiryIndex(0);
+    scrollIfOffscreen(inquirySectionRef.current, { block: 'center', delay: 180 });
     AudioManager.getInstance().playChime({ pitchMultiplier: 0.9, volume: 0.35 });
     AudioManager.getInstance().playFluteNote(392.0, 2.0);
   };
@@ -91,6 +98,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
   const handleNextInquiry = () => {
     if (inquiryIndex < INQUIRY_QUESTIONS.length - 1) {
       setInquiryIndex((prev) => prev + 1);
+      scrollIfOffscreen(inquirySectionRef.current, { block: 'center', delay: 120 });
       AudioManager.getInstance().playTick({ volume: 0.18 });
     }
   };
@@ -98,6 +106,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
   /* ---------------- Step 3: THE SOUL REVELATION ---------------- */
   const handleRevealSoul = () => {
     setStage('soul_revelation');
+    scrollIfOffscreen(revelationSectionRef.current, { block: 'center', delay: 250 });
 
     // Sacred audio soundscape
     AudioManager.getInstance().playGoosebumpsRevelation();
@@ -117,6 +126,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
 
   const handleProceedToKeepsake = () => {
     setStage('card_suite');
+    scrollIfOffscreen(cardSuiteSectionRef.current, { block: 'start', delay: 200 });
     AudioManager.getInstance().playTick({ volume: 0.2 });
   };
 
@@ -233,7 +243,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
           STAGE 2: THE DEEP SELF-INQUIRY (PSYCHOLOGICAL BUILDUP)
           ======================================================== */}
       {stage === 'deep_inquiry' && (
-        <div className="max-w-xl mx-auto p-8 sm:p-10 rounded-3xl bg-ivory border border-gold/30 shadow-ujwala-card relative overflow-hidden animate-in fade-in duration-500">
+        <div ref={inquirySectionRef} className="max-w-xl mx-auto p-8 sm:p-10 rounded-3xl bg-ivory border border-gold/30 shadow-ujwala-card relative overflow-hidden animate-in fade-in duration-500 scroll-mt-28">
           <UjwalaGlow color="lavender" size="lg" className="top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2" />
 
           {/* Stepper Indicator */}
@@ -320,10 +330,11 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
           ======================================================== */}
       {stage === 'soul_revelation' && (
         <motion.div
+          ref={revelationSectionRef}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: 'easeOut' }}
-          className="relative max-w-2xl mx-auto p-8 sm:p-12 rounded-3xl bg-ivory border-2 border-gold/50 shadow-ujwala-halo text-center overflow-hidden"
+          className="relative max-w-2xl mx-auto p-8 sm:p-12 rounded-3xl bg-ivory border-2 border-gold/50 shadow-ujwala-halo text-center overflow-hidden scroll-mt-28"
         >
           {/* Luminous Golden Halo & Ambient Glow */}
           <UjwalaGlow color="gold" size="xl" intensity={0.5} className="top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2" />
@@ -403,7 +414,7 @@ export function FinalContainer({ onComplete }: FinalContainerProps) {
           STAGE 4: KEEPSAKE CUSTOMIZER & 3D INTERACTIVE CARD
           ======================================================== */}
       {stage === 'card_suite' && (
-        <div className="space-y-8 animate-in fade-in duration-500">
+        <div ref={cardSuiteSectionRef} className="space-y-8 animate-in fade-in duration-500 scroll-mt-28">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Customizer Controls (Left 6 Cols) */}
             <div className="lg:col-span-6 p-7 rounded-3xl bg-ivory border border-gold/30 shadow-ujwala-card space-y-6">

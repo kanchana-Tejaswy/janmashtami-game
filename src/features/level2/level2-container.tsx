@@ -20,6 +20,8 @@ import {
 import { UjwalaGlow, LightHalo, IlluminationReveal, GoldenPulse } from '@/components/ui/light-system';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
+import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';
+import { useEffect } from 'react';
 
 interface Level2ContainerProps {
   onComplete: () => void;
@@ -33,6 +35,8 @@ export function Level2Container({ onComplete, onContinue }: Level2ContainerProps
   const [justOpenedId, setJustOpenedId] = useState<number | null>(null);
 
   const detailSectionRef = useRef<HTMLDivElement | null>(null);
+  const climaxSectionRef = useRef<HTMLDivElement | null>(null);
+  const { scrollIfOffscreen } = useRevealAutoScroll();
   const shouldReduceMotion = useReducedMotion();
 
   const totalBoxes = MYSTERY_BOXES.length;
@@ -75,13 +79,16 @@ export function Level2Container({ onComplete, onContinue }: Level2ContainerProps
 
     setActiveBoxDetail(box);
 
-    // Smooth scroll down to details if on mobile
-    if (window.innerWidth < 768 && detailSectionRef.current) {
-      setTimeout(() => {
-        detailSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }, 100);
-    }
+    // Context-aware smooth scroll down to revealed box details if outside viewport
+    scrollIfOffscreen(detailSectionRef.current, { block: 'nearest', delay: 150 });
   };
+
+  // When Box 5 / all boxes are opened, smoothly bring the sacred inquiry climax into view
+  useEffect(() => {
+    if (isAllOpened && climaxSectionRef.current) {
+      scrollIfOffscreen(climaxSectionRef.current, { block: 'center', delay: 250 });
+    }
+  }, [isAllOpened, scrollIfOffscreen]);
 
   const getBoxIcon = (iconName: MysteryBoxItem['iconName'], isClimax?: boolean) => {
     if (isClimax) {
@@ -286,7 +293,7 @@ export function Level2Container({ onComplete, onContinue }: Level2ContainerProps
       {/* ========================================================
           3. REVEALED CONTENT DETAIL PANEL (LIGHT → REVEAL)
           ======================================================== */}
-      <div ref={detailSectionRef}>
+      <div ref={detailSectionRef} className="scroll-mt-28">
         <AnimatePresence mode="wait">
           {activeBoxDetail && (
             <motion.div
@@ -376,10 +383,11 @@ export function Level2Container({ onComplete, onContinue }: Level2ContainerProps
       <AnimatePresence>
         {isAllOpened && (
           <motion.div
+            ref={climaxSectionRef}
             initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 20, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-12 sm:mt-14 mb-8 py-10 px-6 sm:px-12 rounded-3xl text-center max-w-[760px] mx-auto relative overflow-hidden bg-ivory border-2 border-gold/40 shadow-ujwala-halo"
+            className="mt-12 sm:mt-14 mb-8 py-10 px-6 sm:px-12 rounded-3xl text-center max-w-[760px] mx-auto relative overflow-hidden bg-ivory border-2 border-gold/40 shadow-ujwala-halo scroll-mt-28"
           >
             {/* Luminous Golden Ambient Halo */}
             <UjwalaGlow size="lg" color="gold" intensity={0.4} className="top-0 left-1/2 -translate-x-1/2" />

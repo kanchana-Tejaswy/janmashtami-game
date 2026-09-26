@@ -19,6 +19,8 @@ import {
 } from '@/components/ui/icons';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
+import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';
+import { useRef, useEffect } from 'react';
 
 interface Level1ContainerProps {
   onComplete: () => void;
@@ -28,6 +30,10 @@ interface Level1ContainerProps {
 export function Level1Container({ onComplete, onContinue }: Level1ContainerProps) {
   const [removedLayers, setRemovedLayers] = useState<Set<string>>(new Set());
   const [activeTeaching, setActiveTeaching] = useState<LayerItem | null>(null);
+  const { scrollIfOffscreen } = useRevealAutoScroll();
+
+  const teachingSectionRef = useRef<HTMLDivElement | null>(null);
+  const climaxSectionRef = useRef<HTMLDivElement | null>(null);
 
   const totalLayers = IDENTITY_LAYERS.length;
   const isAllRemoved = removedLayers.size === totalLayers;
@@ -35,6 +41,7 @@ export function Level1Container({ onComplete, onContinue }: Level1ContainerProps
   const handleRemoveLayer = (layer: LayerItem) => {
     if (removedLayers.has(layer.id)) {
       setActiveTeaching(layer);
+      scrollIfOffscreen(teachingSectionRef.current, { block: 'nearest' });
       return;
     }
 
@@ -42,6 +49,9 @@ export function Level1Container({ onComplete, onContinue }: Level1ContainerProps
     nextSet.add(layer.id);
     setRemovedLayers(nextSet);
     setActiveTeaching(layer);
+
+    // Context-aware auto-scroll to the newly revealed teaching insight card
+    scrollIfOffscreen(teachingSectionRef.current, { block: 'nearest', delay: 150 });
 
     // Ascending harmonic chime progression for spiritual elevation
     AudioManager.getInstance().playWhoosh({ duration: 0.35, volume: 0.15 });
@@ -65,6 +75,13 @@ export function Level1Container({ onComplete, onContinue }: Level1ContainerProps
       }
     }
   };
+
+  // When all 6 layers are removed, guide the user to the Sacred Revelation
+  useEffect(() => {
+    if (isAllRemoved && climaxSectionRef.current) {
+      scrollIfOffscreen(climaxSectionRef.current, { block: 'center', delay: 250 });
+    }
+  }, [isAllRemoved, scrollIfOffscreen]);
 
   const getLayerIcon = (iconName: LayerItem['iconName']) => {
     switch (iconName) {
@@ -571,7 +588,7 @@ export function Level1Container({ onComplete, onContinue }: Level1ContainerProps
           </div>
 
           {/* Active Contemplative Insight Card */}
-          <div className="min-h-[96px] flex items-center">
+          <div ref={teachingSectionRef} className="min-h-[96px] flex items-center scroll-mt-28">
             <AnimatePresence mode="wait">
               {activeTeaching ? (
                 <motion.div
@@ -607,10 +624,11 @@ export function Level1Container({ onComplete, onContinue }: Level1ContainerProps
       <AnimatePresence>
         {isAllRemoved && (
           <motion.div
+            ref={climaxSectionRef}
             initial={{ opacity: 0, y: 24, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-10 sm:mt-12 mb-8 py-10 px-6 sm:px-10 rounded-3xl text-center max-w-[740px] mx-auto relative overflow-hidden backdrop-blur-2xl bg-white/95 border border-gold-400/50 shadow-ujwala-lg"
+            className="mt-10 sm:mt-12 mb-8 py-10 px-6 sm:px-10 rounded-3xl text-center max-w-[740px] mx-auto relative overflow-hidden backdrop-blur-2xl bg-white/95 border border-gold-400/50 shadow-ujwala-lg scroll-mt-28"
           >
             {/* Ambient Diffused Top Glow */}
             <div

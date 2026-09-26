@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/icons';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
+import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';
 
 interface Level3ContainerProps {
   onComplete: () => void;
@@ -46,41 +47,7 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
   const messageSectionRef = useRef<HTMLDivElement | null>(null);
   const climaxSectionRef = useRef<HTMLDivElement | null>(null);
 
-  /**
-   * Context-aware Auto Scroll:
-   * Checks whether the target element is already comfortably visible in the viewport.
-   * If not, smoothly scrolls it into view respecting header offset and reduced-motion settings.
-   */
-  const scrollToElementIfOffscreen = useCallback(
-    (
-      element: HTMLElement | null,
-      options?: { block?: ScrollLogicalPosition; topOffset?: number; bottomMargin?: number }
-    ) => {
-      if (!element || typeof window === 'undefined') return;
-
-      const topOffset = options?.topOffset ?? 100; // Offset for sticky Torana / navigation
-      const bottomMargin = options?.bottomMargin ?? 40;
-      const rect = element.getBoundingClientRect();
-      const windowHeight = window.innerHeight || document.documentElement.clientHeight;
-
-      // Element is comfortably visible if its top is below the top header and bottom is above the viewport base
-      const isComfortablyVisible =
-        rect.top >= topOffset && rect.bottom <= (windowHeight - bottomMargin);
-
-      if (!isComfortablyVisible) {
-        const prefersReducedMotion =
-          typeof window !== 'undefined' &&
-          window.matchMedia &&
-          window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        element.scrollIntoView({
-          behavior: prefersReducedMotion ? 'auto' : 'smooth',
-          block: options?.block ?? (window.innerWidth < 768 ? 'nearest' : 'center'),
-        });
-      }
-    },
-    []
-  );
+  const { scrollIfOffscreen } = useRevealAutoScroll();
 
   const handleMovementComplete = useCallback(() => {
     setIsBoatMoving(false);
@@ -90,20 +57,15 @@ export function Level3Container({ onComplete, onContinue }: Level3ContainerProps
     }
 
     // Sequence: Boat reaches target -> Message reveals -> Short comfortable pause -> Context-aware smooth scroll
-    setTimeout(() => {
-      scrollToElementIfOffscreen(messageSectionRef.current, { block: 'nearest' });
-    }, 120);
-  }, [scrollToElementIfOffscreen]);
+    scrollIfOffscreen(messageSectionRef.current, { block: 'nearest', delay: 120 });
+  }, [scrollIfOffscreen]);
 
   // When climax revelation is unlocked, smoothly bring it into view
   useEffect(() => {
     if (isCompleted && climaxSectionRef.current) {
-      const timer = setTimeout(() => {
-        scrollToElementIfOffscreen(climaxSectionRef.current, { block: 'center' });
-      }, 250);
-      return () => clearTimeout(timer);
+      scrollIfOffscreen(climaxSectionRef.current, { block: 'center', delay: 250 });
     }
-  }, [isCompleted, scrollToElementIfOffscreen]);
+  }, [isCompleted, scrollIfOffscreen]);
 
   const handleNextStep = () => {
     if (isBoatMoving) return; // Prevent conflicting animations (Option A)
