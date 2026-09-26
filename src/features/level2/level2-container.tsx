@@ -9,12 +9,14 @@ import {
   Trophy,
   Users,
   Compass,
-  SacredLockIcon,
   ChevronRight,
   Sparkle,
+  Check,
+} from 'lucide-react';
+import {
+  SacredLockIcon,
   LotusLineArt,
   DiyaLineArt,
-  Check,
   UjwalaRadianceIcon,
 } from '@/components/ui/icons';
 import { UjwalaGlow, LightHalo, IlluminationReveal, GoldenPulse } from '@/components/ui/light-system';

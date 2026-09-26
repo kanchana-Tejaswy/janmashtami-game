@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { Lock, Sparkle } from '@/components/ui/icons';
+import { Lock, Sparkle } from 'lucide-react';
 import { ToastMessage } from '@/hooks/use-quest-state';
 
 interface ToastProps {

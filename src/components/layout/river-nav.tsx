@@ -3,7 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { StationId } from '@/types';
-import { SacredLockIcon, Check, DiyaLineArt, LotusLineArt, UjwalaRadianceIcon } from '@/components/ui/icons';
+import { Check } from 'lucide-react';
+import { SacredLockIcon, DiyaLineArt, LotusLineArt, UjwalaRadianceIcon } from '@/components/ui/icons';
 
 interface RiverNavProps {
   activeStation: StationId;

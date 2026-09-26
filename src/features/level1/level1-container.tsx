@@ -13,10 +13,9 @@ import {
   Sparkles,
   ChevronRight,
   Sparkle,
-  AtmanSparkIcon,
   Check,
-  DiyaLineArt,
-} from '@/components/ui/icons';
+} from 'lucide-react';
+import { AtmanSparkIcon, DiyaLineArt } from '@/components/ui/icons';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
 import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';

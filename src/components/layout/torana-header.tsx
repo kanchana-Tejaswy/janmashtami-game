@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
-import { Volume2, VolumeX, UjwalaRadianceIcon, LotusLineArt, Sparkle } from '@/components/ui/icons';
+import { Volume2, VolumeX, Sparkle } from 'lucide-react';
+import { UjwalaRadianceIcon, LotusLineArt } from '@/components/ui/icons';
 import { UjwalaGlow, LightHalo } from '@/components/ui/light-system';
 
 interface ToranaHeaderProps {

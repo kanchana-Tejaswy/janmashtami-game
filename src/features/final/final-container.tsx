@@ -10,6 +10,8 @@ import {
   Copy,
   Check,
   ChevronRight,
+} from 'lucide-react';
+import {
   UjwalaRadianceIcon,
   LotusLineArt,
   DiyaLineArt,

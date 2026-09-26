@@ -21,10 +21,9 @@ import {
   ChevronRight,
   ChevronLeft,
   Sparkle,
-  LotusLineArt,
-  DiyaLineArt,
   RotateCcw,
-} from '@/components/ui/icons';
+} from 'lucide-react';
+import { LotusLineArt, DiyaLineArt } from '@/components/ui/icons';
 import { AudioManager } from '@/audio/audio-manager';
 import confetti from 'canvas-confetti';
 import { useRevealAutoScroll } from '@/hooks/use-reveal-auto-scroll';
